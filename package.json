@@ -1,8 +1,12 @@
 {
     "name": "flawless-cut",
     "version": "2.0.0",
-    "main": "main.html",
+    "description": "Fast and lossless video cutter and merger",
+    "copyright": "Copyright (c) 2019-2025",
     "repository": "http://github.com/metadream/flawless-cut",
+    "license": "MIT",
+
+    "main": "main.html",
     "window": {
         "title": "Flawless Cut",
         "icon": "assets/logo.png",
