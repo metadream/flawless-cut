@@ -38,8 +38,8 @@ Please install it yourself.
 ### 2\. Install Dependencies
 
 ```
-export ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"
-npm install
+npm install -g nw
+nw -v
 ```
 
 ### 3\. Run and Debug
@@ -58,6 +58,5 @@ sudo apt install -y libmediainfo-dev
 ### 4\. Build by Platform
 
 ```
-npm run build:linux
-npm run build:win
+npm run build
 ```
