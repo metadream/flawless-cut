@@ -2,7 +2,7 @@
 
 Flawless-Cut was developed to improve the user interface of another application, [Lossless-Cut](https://github.com/mifi/lossless-cut), a new plan for UI were mentioned in that project's issue but never upgraded. Compared to Lossless-Cut, Flawless-Cut removes some infrequently used features and user preferences to keep it simple and easy to use. Although Flawless-Cut is almost completely rewritten in terms of code, it still borrows from many practices of Lossless-Cut, thanks for that.
 
-![Software Interface](https://raw.githubusercontent.com/metadream/flawless-cut/master/screenshot.png)
+![Software Interface](https://raw.githubusercontent.com/metadream/flawless-cut/master/assets/screenshot.png)
 
 ## Main Features
 
