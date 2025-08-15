@@ -2,6 +2,7 @@ import { showLoading, showMessage } from "./utils.js";
 import opener from "./opener.js";
 import player from "./player.js";
 import audio from "./audio.js";
+import ffmpeg from "./ffmpeg.js";
 
 const video = $('video');
 
@@ -52,14 +53,16 @@ export default new class {
         }
     }
 
-    setPath(filePath) {
-        video.src = video.path = filePath;
+    async setPath(filePath) {
+        video.path = filePath;
+        video.src = 'file://' + filePath;
         video.isTranscoded = false;
         video.startTime = 0;
 
-        // this.metadata = await ffmpeg.getMediaInfo(source)  // TODO
         player.reset();
         player.enable(false);
+
+        this.metadata = await ffmpeg.getMediaInfo(filePath);
 
         // TODO
         if (this.getDuration()) {

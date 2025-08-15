@@ -7,6 +7,10 @@ window.$ = function(selector) {
     return document.querySelector(selector);
 }
 
+window.println = function(obj) {
+    process.stdout.write(JSON.stringify(obj, null, 2) + "\n");
+}
+
 /** Show message */
 export function showMessage(text) {
     let message = $('div.message');
