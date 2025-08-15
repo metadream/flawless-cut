@@ -1,36 +1,19 @@
 {
     "name": "flawless-cut",
-    "version": "1.0.1",
-    "description": "Fast and lossless video cutter and merger",
-    "author": "Ai Chen",
-    "repository": "github:metadream/app-flawless-cut",
-    "copyright": "Copyright (c) 2019-2023",
-    "license": "MIT",
-    "main": "app/main.js",
+    "version": "2.0.0",
+    "main": "main.html",
+    "repository": "http://github.com/metadream/flawless-cut",
+    "window": {
+        "title": "Flawless Cut",
+        "icon": "assets/logo.png",
+        "position": "center",
+        "width": 800,
+        "height": 580,
+        "min_width": 600,
+        "min_height": 435
+    },
     "scripts": {
-        "start": "electron .",
-        "build:linux": "electron-builder -l",
-        "build:win": "electron-builder -w"
-    },
-    "build": {
-        "appId": "flawless-cut",
-        "win": {
-            "target": [
-                "nsis"
-            ]
-        },
-        "linux": {
-            "target": [
-                "deb"
-            ]
-        }
-    },
-    "devDependencies": {
-        "electron": "^23.1.0",
-        "electron-builder": "^23.6.0"
-    },
-    "dependencies": {
-        "string-to-stream": "^3.0.1",
-        "@electron/remote": "^2.0.10"
+        "start": "nw .",
+        "build": "nwbuild . --platforms win64,osx64,linux64 --buildDir dist/ --glob=false"
     }
 }
