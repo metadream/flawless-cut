@@ -5,7 +5,6 @@
     "copyright": "Copyright (c) 2019-2025",
     "repository": "http://github.com/metadream/flawless-cut",
     "license": "MIT",
-
     "main": "main.html",
     "window": {
         "title": "Flawless Cut",
