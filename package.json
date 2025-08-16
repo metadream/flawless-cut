@@ -20,7 +20,7 @@
         "build": "nwbuild . --platforms win64,osx64,linux64 --glob=false"
     },
     "nwbuild": {
-        "version": "0.102.0",
+        "version": "0.102.1",
         "logLevel": "info",
         "app": {
             "name": "Flawless Cut",
