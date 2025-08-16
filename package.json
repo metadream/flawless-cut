@@ -16,7 +16,24 @@
         "min_height": 435
     },
     "scripts": {
-        "start": "nw .",
-        "build": "nwbuild . --platforms win64,osx64,linux64 --buildDir dist/ --glob=false"
+        "start": "nw --enable-logging=stderr .",
+        "build": "nwbuild . --platforms win64,osx64,linux64 --glob=false"
+    },
+    "nwbuild": {
+        "version": "0.102.0",
+        "logLevel": "info",
+        "app": {
+            "name": "Flawless Cut",
+            "copyright": "Copyright © 2025 ArrayWork",
+            "identifier": "com.arraywork.flawless-cut",
+            "LSApplicationCategoryType": "public.app-category.utilities",
+            "CFBundleIdentifier": "com.arraywork.flawless-cut",
+            "CFBundleDisplayName": "Flawless Cut",
+            "CFBundleName": "Flawless Cut",
+            "CFBundleShortVersionString": "2.0.0",
+            "CFBundleVersion": "2.0.0",
+            "NSHumanReadableCopyright": "Copyright © 2025 ArrayWork",
+            "NSLocalNetworkUsageDescription": "None"
+        }
     }
 }
