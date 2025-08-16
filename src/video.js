@@ -63,7 +63,7 @@ export default new class {
         player.enable(false);
 
         this.metadata = await ffmpeg.getMediaInfo(filePath);
-        println(this.metadata);
+        console.log(this.metadata);
 
         // TODO
         if (this.getDuration()) {

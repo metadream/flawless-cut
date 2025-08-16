@@ -6,34 +6,14 @@
     "repository": "http://github.com/metadream/flawless-cut",
     "license": "MIT",
     "main": "main.html",
+    "chromium-args": "--auto-open-devtools-for-tabs",
     "window": {
         "title": "Flawless Cut",
-        "icon": "assets/logo.png",
+        "icon": "./assets/logo.png",
         "position": "center",
         "width": 800,
         "height": 580,
         "min_width": 600,
         "min_height": 435
-    },
-    "scripts": {
-        "start": "nw --enable-logging=stderr .",
-        "build": "nwbuild . --platforms win64,osx64,linux64 --glob=false"
-    },
-    "nwbuild": {
-        "version": "0.102.1",
-        "logLevel": "info",
-        "app": {
-            "name": "Flawless Cut",
-            "copyright": "Copyright © 2025 ArrayWork",
-            "identifier": "com.arraywork.flawless-cut",
-            "LSApplicationCategoryType": "public.app-category.utilities",
-            "CFBundleIdentifier": "com.arraywork.flawless-cut",
-            "CFBundleDisplayName": "Flawless Cut",
-            "CFBundleName": "Flawless Cut",
-            "CFBundleShortVersionString": "2.0.0",
-            "CFBundleVersion": "2.0.0",
-            "NSHumanReadableCopyright": "Copyright © 2025 ArrayWork",
-            "NSLocalNetworkUsageDescription": "None"
-        }
     }
 }

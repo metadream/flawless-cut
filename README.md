@@ -1,8 +1,19 @@
 # Flawless-Cut
 
-## TODO
-- 启动报错
-- 无法打开开发者工具（仅支持SDK方式？SDK在mac上无法打开）
+下载sdk：https://dl.nwjs.io/
+解压后将nwjs.app复制到应用程序目录(其他文件可以不要)，移除 quarantine 标记:xattr -cr nwjs.app；
+
+创建命令别名：
+echo 'alias nw="/Applications/nwjs.app/Contents/MacOS/nwjs"' >> ~/.zshrc
+source ~/.zshrc
+
+由于H.264编解码器并非开源软件，因此在播放此类视频时需要作额外设置，否则可能无法输出声音。首先从社区获取预编译的二进制文件，并覆盖系统中对应文件，路径、文件名因平台而异。
+https://github.com/nwjs-ffmpeg-prebuilt/nwjs-ffmpeg-prebuilt/releases
+- Windows: `ffmpeg.dll`
+- MacOS: `nwjs.app/Contents/Frameworks/nwjs Framework.framework/Versions/<chromium-version>/libffmpeg.dylib`
+- Linux: `lib/libffmpeg.so`
+
+---
 
 Flawless-Cut was developed to improve the user interface of another
 application, [Lossless-Cut](https://github.com/mifi/lossless-cut), a new plan for UI were mentioned in that project's
@@ -50,20 +61,6 @@ the same as the native support format.
 Please install it yourself.
 
 ### 2\. Install Dependencies
-
-```
-npm install -g nw
-nw -v
-```
-
-由于H.264编解码器并非开源软件，因此在播放此类视频时需要作额外设置，否则可能无法输出声音。首先从社区获取预编译的二进制文件，并覆盖系统中对应文件，路径、文件名因平台而异。
-https://github.com/nwjs-ffmpeg-prebuilt/nwjs-ffmpeg-prebuilt/releases
-- Windows: `ffmpeg.dll`
-- MacOS: `nwjs.app/Contents/Frameworks/nwjs Framework.framework/Versions/<chromium-version>/libffmpeg.dylib`
-- Linux: `lib/libffmpeg.so`
-
-console无法输出到终端，需要在启动命令行中增加参数：
-`nw --enable-logging=stderr .`
 
 ### 3\. Run and Debug
 
