@@ -1,62 +1,124 @@
-// 下载normal版本
-// 解压
-// 复制到dist
-// 创建app.nw
-// 替换图标
-// 设置应用名称等
-// 替换libffmpeg
-
 import packageJson from './package.json' with { type: 'json' };
-import compressing from 'compressing';
+import path from "node:path";
 import fs from "node:fs";
 import stream from 'node:stream';
-import path from "node:path";
+import compressing from 'compressing';
 
+// 0. Create tmp directory
 const tmpDir = './tmp';
 await mkdirs(tmpDir);
 
-const config = Object.assign({
-    "mirror": "https://dl.nwjs.io",
-    "version": "0.102.1",
-    "platform": "linux-x64",
-    "buildDir": "./dist",
-    "files": []
-}, packageJson.build);
+const { mirror, version, platform, arch, buildDir, files } = getBuildConfig();
+const nwDirName = `nwjs-v${version}-${platform}-${arch}`;
+const zipFormat = platform === 'linux' ? "tar.gz" : "zip";
+const zipFileName = `${nwDirName}.${zipFormat}`
+const nwUrl = joinUrl(mirror, "v" + version, zipFileName);
+const nwFile = path.join(tmpDir, zipFileName);
 
-const { mirror, version, platform, buildDir, files } = config;
-const extname = platform.startsWith("linux") ? "tar.gz" : "zip";
-const filename = `nwjs-v${version}-${platform}.${extname}`
-const frameworkUrl = joinUrl(mirror, "v" + version, filename);
-const frameworkFile = path.join(tmpDir, filename);
+// 1. Download normal release version of NW.js
+await download(nwUrl, nwFile);
 
-await download(frameworkUrl, frameworkFile);
+// 2. Decompress archived file
+zipFormat === 'tar.gz'
+    ? await compressing.tgz.uncompress(nwFile, tmpDir)
+    : await compressing.zip.uncompress(nwFile, tmpDir);
+console.log('Decompress completed.');
 
-if (extname == 'tar.gz') {
-    await compressing.tgz.uncompress(frameworkFile, tmpDir);
-} else {
-    await compressing.zip.uncompress(frameworkFile, tmpDir);
-}
-
-if (platform.startsWith("osx")) {
-    const frameworkDir = path.join(tmpDir, `nwjs-v${version}-${platform}`, 'nwjs.app');
-    await fs.promises.cp(frameworkDir, path.join(buildDir, 'nwjs.app'), { recursive: true });
-}
-
+// 3. Copy MW.js framework to build directory
+await copyFramework(platform);
 await fs.promises.rm(tmpDir, { recursive: true, force: true });
+console.log('Copy framework completed.');
 
-const appDir = path.join(buildDir, 'nwjs.app/Contents/Resources/app.nw');
-for (const file of files) {
-    await fs.promises.cp(file, path.join(appDir, file), { recursive: true });
+// 4. Build app.nw package
+await buildPackage(platform);
+console.log('Packaging completed.');
+
+// 5. Replace libffmpeg with prebuild version
+await replaceLibFfmpeg(platform);
+console.log('Replace libffmpeg completed.');
+
+// 6. Update app icon
+console.log('Update app icon completed.');
+
+// 7. Update app settings
+console.log('Update app settings completed.');
+console.log('Build completed: ', buildDir);
+
+async function replaceLibFfmpeg(platform) {
+    let prebuildFile, searchScope;
+    if (platform === "osx") {
+        prebuildFile = path.join(buildDir, platform, 'nwjs.app/Contents/Resources/app.nw/bin/darwin/libffmpeg.dylib');
+        searchScope = path.join(buildDir, platform, 'nwjs.app/Contents/Frameworks/nwjs Framework.framework/Versions');
+    } else if (platform === 'linux') {
+
+    } else if (platform === 'win') {
+
+    } else {
+        throw new Error('Unknown platform');
+    }
+
+    // Find the path of libffmpeg and replace with prebuild version
+    const libffmpegFile = findFilesSync(searchScope, 'libffmpeg.dylib');
+    if (libffmpegFile) {
+        await fs.promises.rename(prebuildFile, libffmpegFile);
+    }
 }
 
-const aa = path.join(buildDir, 'nwjs.app/Contents/Frameworks/nwjs Framework.framework/Versions');
-const libffmpeg = findFilesSync(aa, 'libffmpeg.dylib');
-if (libffmpeg) {
-    await fs.promises.cp('./bin/darwin/libffmpeg.dylib', libffmpeg);
+async function buildPackage(platform) {
+    let appPackage, binDir;
+    if (platform === "osx") {
+        appPackage = path.join(buildDir, platform, 'nwjs.app/Contents/Resources/app.nw');
+        binDir = './bin/darwin';
+    } else if (platform === 'linux') {
+
+    } else if (platform === 'win') {
+
+    } else {
+        throw new Error('Unknown platform');
+    }
+
+    // Copy src files to app package
+    for (const file of files) {
+        await fs.promises.cp(file, path.join(appPackage, file), { recursive: true });
+    }
+    // Copy executable tool to app package
+    await fs.promises.cp(binDir, path.join(appPackage, binDir), { recursive: true });
+}
+
+async function copyFramework(platform) {
+    let nwDir, appDir;
+    if (platform === "osx") {
+        nwDir = path.join(tmpDir, nwDirName, 'nwjs.app');
+        appDir = path.join(buildDir, platform, 'nwjs.app');
+    } else if (platform === 'linux') {
+
+    } else if (platform === 'win') {
+
+    } else {
+        throw new Error('Unknown platform');
+    }
+    await fs.promises.cp(nwDir, appDir, { recursive: true });
+}
+
+function getBuildConfig() {
+    const config = Object.assign({
+        "mirror": "https://dl.nwjs.io",
+        "version": null,
+        "platform": null,
+        "arch": null,
+        "buildDir": "./dist",
+        "files": []
+    }, packageJson.build);
+
+    if (!config.version) throw new Error("NW.js version unspecified");
+    if (!config.platform) throw new Error("NW.js platform unspecified");
+    if (!config.arch) throw new Error("NW.js arch unspecified");
+    if (!config.files.length) throw new Error("NW.js app files unspecified");
+    return config;
 }
 
 async function download(url, file) {
-    console.log('Download framework from: ' + url);
+    console.log('Download from: ' + url);
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Download failed: HTTP ${response.status}`);
     if (!response.body) throw new Error('Download failed: Response has no body');

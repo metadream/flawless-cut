@@ -19,7 +19,8 @@
     "build": {
         "mirror": "https://dl.nwjs.io",
         "version": "0.102.1",
-        "platform": "osx-arm64",
+        "platform": "osx",
+        "arch": "arm64",
         "buildDir": "./dist",
         "files": [
             "./main.html",
