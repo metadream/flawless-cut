@@ -6,7 +6,7 @@
     "repository": "http://github.com/metadream/flawless-cut",
     "license": "MIT",
     "main": "main.html",
-    "chromium-args": "--auto-open-devtools-for-tabs",
+    "type": "module",
     "window": {
         "title": "Flawless Cut",
         "icon": "./assets/logo.png",
@@ -15,5 +15,20 @@
         "height": 580,
         "min_width": 600,
         "min_height": 435
+    },
+    "build": {
+        "mirror": "https://dl.nwjs.io",
+        "version": "0.102.1",
+        "platform": "osx-arm64",
+        "buildDir": "./dist",
+        "files": [
+            "./main.html",
+            "./package.json",
+            "./assets",
+            "./src"
+        ]
+    },
+    "devDependencies": {
+        "compressing": "^2.0.0"
     }
 }
