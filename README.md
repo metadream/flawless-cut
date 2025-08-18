@@ -13,9 +13,6 @@ https://github.com/nwjs-ffmpeg-prebuilt/nwjs-ffmpeg-prebuilt/releases
 - MacOS: `nwjs.app/Contents/Frameworks/nwjs Framework.framework/Versions/<chromium-version>/libffmpeg.dylib`
 - Linux: `lib/libffmpeg.so`
 
-app.nw 放置在 Resources/ 目录下
-
-NODE_ENV=development nw .
 
 ---
 
