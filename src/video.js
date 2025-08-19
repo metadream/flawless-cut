@@ -2,11 +2,11 @@ import { isNumeric, showLoading, showMessage } from "./utils.js";
 import { Player } from "./player.js";
 import audio from "./audio.js";
 import ffmpeg from "./ffmpeg.js";
-import http from "node:http";
 
+const http = require("node:http");
 const fileChooser = $('#file-chooser');
 const video = $('video');
-const host = 'http://127.0.0.1:4725';
+const serverPort = 4725;
 let player = null;
 
 /**
@@ -20,7 +20,6 @@ export class Video {
     server = null;
     transcoded = false;
     startTime = 0;
-    currentTime = 0;
 
     constructor() {
         player = new Player(this);
@@ -77,10 +76,10 @@ export class Video {
         else if (timestamp > this.getDuration()) timestamp = this.getDuration();
 
         if (this.transcoded) {
-            this.src = host + '?source=' + this.source + '&fileSize=' + this.getMetadata('General.FileSize') + '&startTime=' + timestamp;
             this.startTime = timestamp;
+            video.src = '?source=' + this.filePath + '&fileSize=' + this.getMetadata('General.FileSize') + '&startTime=' + timestamp;
         } else {
-            this.currentTime = timestamp;
+            video.currentTime = timestamp;
         }
     }
 
@@ -107,7 +106,7 @@ export class Video {
     }
 
     getCurrentTime() {
-        return this.currentTime + this.startTime;
+        return video.currentTime + this.startTime;
     }
 
     getDuration() {
@@ -128,7 +127,8 @@ export class Video {
         if (this.server && this.server.listening) return;
 
         this.server = http.createServer((request, response) => {
-            const params = parseQuery(request.url);
+            const url = new URL(request.url, `http://${request.headers.host}`);
+            const params = Object.fromEntries(url.searchParams);
             const ffProc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
             ffProc.stdout.pipe(response);
 
@@ -137,11 +137,20 @@ export class Video {
                 ffProc.stderr.destroy();
                 ffProc.kill();
             });
-        }).listen(4725);
+        }).listen(serverPort);
 
         this.server.on('error', e => {
             showMessage(e.message);
         });
     }
+
+    /** Extends original video properties and methods  */
+    play() { video.play(); }
+
+    pause() { video.pause(); }
+
+    get paused() { return video.paused; }
+
+    get ended() { return video.ended; }
 
 }
