@@ -1,4 +1,5 @@
 import { formatDuration, parseDuration } from "./utils.js";
+import { Merger } from "./merger.js";
 
 const timeline = $('.timeline');
 const currentTime = $('#currentTime');
@@ -21,9 +22,11 @@ const captureBtn = $('.capture');
 const extractBtn = $('.extract');
 const convertBtn = $('.convert');
 const openRecordBtn = $('.open-record');
+const openFilesBtn = $('.open-files');
 
 let video = null;
-// const merger = new Merger();
+const merger = new Merger();
+
 // const recorder = new Recorder();
 
 /**
@@ -101,7 +104,31 @@ export class Player {
         }
 
         openRecordBtn.onclick = function() {
-            recorder.show()
+            // recorder.show();
+            var tray = new nw.Tray({ title: 'Tray', icon: 'img/icon.png' });
+
+            // Give it a menu
+            var menu = new nw.Menu();
+            menu.append(new nw.MenuItem({
+                // label: 'box1', click: function() {
+                //     nw.Window.get().show();
+                // }
+                label: "Click me",
+                click: function() {
+                    console.log("I'm clicked");
+                }
+            }));
+            tray.menu = menu;
+
+            nw.Window.get().hide();
+        }
+
+        openFilesBtn.onclick = async function() {
+            const { canceled, filePaths } = await openFileDialog(true); // TODO
+            if (!canceled && filePaths && filePaths.length > 1) {
+                video.sources = filePaths;
+                merger.setFileList(filePaths);
+            }
         }
 
         document.onkeyup = function(e) {
