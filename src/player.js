@@ -1,3 +1,5 @@
+import { formatDuration } from "./utils.js";
+
 const timeline = $('.timeline');
 const currentTime = $('#currentTime');
 const duration = $('#duration');
@@ -64,6 +66,18 @@ export default new class {
     updateTime(time, duration) {
         currentTime.innerHTML = formatDuration(time);
         progress.style.left = (time / duration) * 100 + '%';
+    }
+
+    displayMetadataOnTitle(format, frameRate, bitRate, samplingRate) {
+        const metadata = [format]
+        if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + 'fps')
+        if (bitRate) metadata.push(Math.round(bitRate / 1000) + 'kbps')
+        if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + 'kHz')
+        document.title = nw.App.manifest.window.title + '  |  ' + metadata.join(', ')
+    }
+
+    resetDuration(seconds) {
+        duration.innerHTML = segmentEndTime.value = formatDuration(seconds);
     }
 
 }

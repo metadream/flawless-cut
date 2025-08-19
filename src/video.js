@@ -1,4 +1,4 @@
-import { showLoading, showMessage } from "./utils.js";
+import { isNumeric, showLoading, showMessage } from "./utils.js";
 import opener from "./opener.js";
 import player from "./player.js";
 import audio from "./audio.js";
@@ -13,6 +13,8 @@ const video = $('video');
 export default new class {
 
     metadata = null;
+    transcoded = false;
+    startTime = 0;
 
     constructor() {
         video.onloadstart = function() {
@@ -32,7 +34,7 @@ export default new class {
         }
 
         video.ontimeupdate = () => {
-            player.updateTime(video.getCurrentTime(), this.getDuration());
+            player.updateTime(this.getCurrentTime(), this.getDuration());
         }
 
         video.onended = function() {
@@ -40,8 +42,8 @@ export default new class {
             player.setStatus('play');
         }
 
-        video.onerror = function() {
-            if (video.isTranscoded) {
+        video.onerror = () => {
+            if (this.transcoded) {
                 showLoading(false);
                 showMessage('Unsupported video format');
                 opener.visible(true);
@@ -56,22 +58,23 @@ export default new class {
     async setPath(filePath) {
         video.path = filePath;
         video.src = 'file://' + filePath;
-        video.isTranscoded = false;
-        video.startTime = 0;
-
+        this.startTime = 0;
+        this.transcoded = false;
         player.reset();
         player.enable(false);
 
         this.metadata = await ffmpeg.getMediaInfo(filePath);
-        console.log(this.metadata);
 
-        // TODO
         if (this.getDuration()) {
-            duration.innerHTML = segmentEndTime.value = formatDuration(this.getDuration());
-            this.showMetadataOnTitle();
+            const format = this.getMetadata('General.Format') || ''
+            const frameRate = this.getMetadata('General.FrameRate')
+            const bitRate = this.getMetadata('General.OverallBitRate')
+            const samplingRate = this.getMetadata('Audio.SamplingRate')
+            player.displayMetadataOnTitle(format, frameRate, bitRate, samplingRate);
+            player.resetDuration(this.getDuration());
         }
 
-        if (video.getMetadata('Audio') && !video.getMetadata('Video')) {
+        if (this.getMetadata('Audio') && !this.getMetadata('Video')) {
             audio.play();
         } else {
             audio.pause();
@@ -83,9 +86,18 @@ export default new class {
         return this.currentTime + this.startTime;
     }
 
-    // TODO
     getDuration() {
         return this.getMetadata('General.Duration');
+    }
+
+    getMetadata(key) {
+        let i = 0, value = this.metadata;
+        key = key.split('.');
+        while (value && i < key.length) {
+            value = value[key[i]];
+            i++;
+        }
+        return isNumeric(value) ? Number(value) : value;
     }
 
 }
