@@ -21,11 +21,77 @@ const captureBtn = $('.capture');
 const extractBtn = $('.extract');
 const convertBtn = $('.convert');
 
+let video = null;
+
 /**
  * Component: Player Controls
- * @Since 2025-08-15
+ * @since 2025-08-15
  */
-export default new class {
+export class Player {
+
+    constructor(_video) {
+        video = _video;
+
+        playBtn.onclick = () => {
+            if (video.paused) {
+                if (video.ended) video.seek(0)
+                video.play()
+                playBtn.className = 'pause'
+            } else {
+                video.pause()
+                playBtn.className = 'play'
+            }
+        }
+
+        cutStartBtn.onclick = () => {
+            segmentStartTime.value = formatDuration(video.getCurrentTime())
+            createSegment()
+        }
+
+        cutEndBtn.onclick = () => {
+            segmentEndTime.value = formatDuration(video.getCurrentTime())
+            createSegment()
+        }
+
+        segmentStartBtn.onclick = () => {
+            video.seek(parseDuration(segmentStartTime.value))
+        }
+
+        segmentEndBtn.onclick = () => {
+            video.seek(parseDuration(segmentEndTime.value))
+        }
+
+        videoStartBtn.onclick = () => {
+            video.seek(0)
+        }
+
+        videoEndBtn.onclick = () => {
+            video.seek(video.getDuration())
+        }
+
+        timeline.onclick = function(e) {
+            if (video.getDuration() !== undefined)
+                video.seek(video.getDuration() * (e.clientX / this.offsetWidth))
+        }
+
+        segmentStartTime.oninput = segmentEndTime.oninput = function() {
+            video.seek(parseDuration(this.value))
+            createSegment()
+        }
+
+        document.onkeyup = function(e) {
+            e.preventDefault()
+            if (video.getDuration() === undefined) return
+            if (e.keyCode === 32) return playBtn.onclick()   // SPACE
+            if (e.keyCode === 37) return video.seek(video.getCurrentTime() - 1)  // LEFT
+            if (e.keyCode === 39) return video.seek(video.getCurrentTime() + 1)  // RIGHT
+        }
+    }
+
+    createSegment() {
+        segment.style.left = (parseDuration(segmentStartTime.value) / video.getDuration()) * 100 + '%'
+        segment.style.right = (100 - (parseDuration(segmentEndTime.value) / video.getDuration()) * 100) + '%'
+    }
 
     setStatus(v) {
         playBtn.className = v;
@@ -35,7 +101,15 @@ export default new class {
         return playBtn.className === 'play';
     }
 
-    reset() {
+    getSegmentStartTime() {
+        return segmentStartTime.value
+    }
+
+    getSegmentEndTime() {
+        return segmentEndTime.value
+    }
+
+    resetControls() {
         progress.style.left = 0;
         segment.style.left = 0;
         segment.style.right = '100%';
@@ -45,7 +119,7 @@ export default new class {
         segmentEndTime.value = '00:00:00.000';
     }
 
-    enable(v) {
+    enableControls(v) {
         v = !v;
         playBtn.disabled = v;
         videoStartBtn.disabled = v;
@@ -63,21 +137,27 @@ export default new class {
         convertBtn.disabled = v;
     }
 
-    updateTime(time, duration) {
-        currentTime.innerHTML = formatDuration(time);
-        progress.style.left = (time / duration) * 100 + '%';
+    updateTimeline() {
+        const time = this.video.getCurrentTime();
+        currentTime.innerHTML = formatDuration(time)
+        progress.style.left = (time / this.video.getDuration()) * 100 + '%'
     }
 
-    displayMetadataOnTitle(format, frameRate, bitRate, samplingRate) {
-        const metadata = [format]
-        if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + 'fps')
-        if (bitRate) metadata.push(Math.round(bitRate / 1000) + 'kbps')
-        if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + 'kHz')
-        document.title = nw.App.manifest.window.title + '  |  ' + metadata.join(', ')
+    displayMetadata() {
+        const format = video.getMetadata('General.Format') || '';
+        const frameRate = video.getMetadata('General.FrameRate');
+        const bitRate = video.getMetadata('General.OverallBitRate');
+        const samplingRate = video.getMetadata('Audio.SamplingRate');
+
+        const metadata = [format];
+        if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + 'fps');
+        if (bitRate) metadata.push(Math.round(bitRate / 1000) + 'kbps');
+        if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + 'kHz');
+        document.title = nw.App.manifest.window.title + '  |  ' + metadata.join(', ');
     }
 
-    resetDuration(seconds) {
-        duration.innerHTML = segmentEndTime.value = formatDuration(seconds);
+    updateDuration() {
+        duration.innerHTML = segmentEndTime.value = formatDuration(video.getDuration());
     }
 
 }

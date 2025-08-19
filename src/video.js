@@ -1,77 +1,101 @@
 import { isNumeric, showLoading, showMessage } from "./utils.js";
-import opener from "./opener.js";
-import player from "./player.js";
+import { Player } from "./player.js";
 import audio from "./audio.js";
 import ffmpeg from "./ffmpeg.js";
+import http from "node:http";
 
+const fileChooser = $('#file-chooser');
 const video = $('video');
+const host = 'http://127.0.0.1:4725';
+let player = null;
 
 /**
  * Component: Video Object
- * @Since 2025-08-15
+ * @since 2025-08-15
  */
-export default new class {
+export class Video {
 
+    filePath = null;
     metadata = null;
+    server = null;
     transcoded = false;
     startTime = 0;
+    currentTime = 0;
 
     constructor() {
+        player = new Player(this);
+
         video.onloadstart = function() {
             showLoading(true);
         }
 
-        video.onloadedmetadata = function() {
+        video.onloadedmetadata = () => {
+            fileChooser.style.opacity = 0;
+            player.enableControls(true);
             showLoading(false);
-            opener.visible(false);
-            player.enable(true);
         }
 
-        video.oncanplay = function() {
+        video.oncanplay = () => {
             if (player.isPaused()) {  // TODO 是否可去掉此判断
-                this.play();
+                video.play();
             }
         }
 
         video.ontimeupdate = () => {
-            player.updateTime(this.getCurrentTime(), this.getDuration());
+            player.updateTimeline();
         }
 
-        video.onended = function() {
-            this.pause();
+        video.onended = () => {
+            video.pause();
             player.setStatus('play');
         }
 
         video.onerror = () => {
             if (this.transcoded) {
+                fileChooser.style.opacity = 1;
+                player.enableControls(false);
                 showLoading(false);
                 showMessage('Unsupported video format');
-                opener.visible(true);
-                player.enable(false);
             } else {
                 showMessage('This video needs transcoding, playback will be slower');
-                // video.transcode();  // TODO
+                this.transcode();
             }
         }
     }
 
+    transcode() {
+        if (!this.transcoded) {
+            this.transcoded = true;
+            this.seek(0);
+            this.createServer();
+        }
+    }
+
+    seek(timestamp) {
+        if (!isNumeric(timestamp)) return;
+        if (timestamp < 0) timestamp = 0;
+        else if (timestamp > this.getDuration()) timestamp = this.getDuration();
+
+        if (this.transcoded) {
+            this.src = host + '?source=' + this.source + '&fileSize=' + this.getMetadata('General.FileSize') + '&startTime=' + timestamp;
+            this.startTime = timestamp;
+        } else {
+            this.currentTime = timestamp;
+        }
+    }
+
     async setPath(filePath) {
-        video.path = filePath;
         video.src = 'file://' + filePath;
-        this.startTime = 0;
+        this.filePath = filePath;
         this.transcoded = false;
-        player.reset();
-        player.enable(false);
+        this.startTime = 0;
+        player.resetControls();
+        player.enableControls(false);
 
         this.metadata = await ffmpeg.getMediaInfo(filePath);
-
         if (this.getDuration()) {
-            const format = this.getMetadata('General.Format') || ''
-            const frameRate = this.getMetadata('General.FrameRate')
-            const bitRate = this.getMetadata('General.OverallBitRate')
-            const samplingRate = this.getMetadata('Audio.SamplingRate')
-            player.displayMetadataOnTitle(format, frameRate, bitRate, samplingRate);
-            player.resetDuration(this.getDuration());
+            player.updateDuration();
+            player.displayMetadata();
         }
 
         if (this.getMetadata('Audio') && !this.getMetadata('Video')) {
@@ -98,6 +122,26 @@ export default new class {
             i++;
         }
         return isNumeric(value) ? Number(value) : value;
+    }
+
+    createServer() {
+        if (this.server && this.server.listening) return;
+
+        this.server = http.createServer((request, response) => {
+            const params = parseQuery(request.url);
+            const ffProc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
+            ffProc.stdout.pipe(response);
+
+            request.on('close', () => {
+                ffProc.stdout.destroy();
+                ffProc.stderr.destroy();
+                ffProc.kill();
+            });
+        }).listen(4725);
+
+        this.server.on('error', e => {
+            showMessage(e.message);
+        });
     }
 
 }
