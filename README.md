@@ -1,7 +1,7 @@
 # Flawless-Cut
 
 下载sdk：https://dl.nwjs.io/
-解压后将nwjs.app复制到应用程序目录(其他文件可以不要)，移除 quarantine 标记:xattr -cr nwjs.app；
+解压后将nwjs.app复制到应用程序目录(其他文件可以不要)，移除 quarantine 标记:xattr -dr nwjs.app；
 
 创建命令别名：
 echo 'alias nw="/Applications/nwjs.app/Contents/MacOS/nwjs"' >> ~/.zshrc
