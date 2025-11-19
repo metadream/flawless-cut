@@ -1,13 +1,13 @@
 {
     "name": "flawless-cut",
-    "productName": "Flawless Cut",
     "version": "1.1.0",
-    "description": "Fast and lossless video cutter and merger",
-    "author": "Ai Chen",
+    "description": "Fast, lossless video cutter and merger",
+    "author": "Marco Chan",
     "repository": "github:metadream/flawless-cut",
-    "copyright": "Copyright (c) 2019-2023",
+    "copyright": "Copyright (c) 2019-2026",
     "license": "MIT",
-    "main": "app/main.js",
+    "type": "module",
+    "main": "main.js",
     "scripts": {
         "start": "electron .",
         "build:linux": "electron-builder -l",
@@ -18,14 +18,18 @@
         "appId": "flawless-cut",
         "productName": "Flawless Cut",
         "win": {
-            "target": [ "nsis" ]
+            "target": [
+                "nsis"
+            ]
         },
         "linux": {
-            "target": [ "deb" ]
+            "target": [
+                "deb"
+            ]
         },
         "mac": {
-            "icon": "build/icons/icon.icns",
             "target": "dmg",
+            "icon": "assets/icons/icon.icns",
             "category": "public.app-category.productivity",
             "extendInfo": {
                 "CFBundleDisplayName": "Flawless Cut"
@@ -33,11 +37,10 @@
         }
     },
     "devDependencies": {
-        "electron": "^23.1.0",
-        "electron-builder": "^23.6.0"
+        "electron": "^39.2.2",
+        "electron-builder": "^26.0.12"
     },
     "dependencies": {
-        "string-to-stream": "^3.0.1",
-        "@electron/remote": "^2.0.10"
+        "string-to-stream": "^3.0.1"
     }
 }
