@@ -1,6 +1,4 @@
 node_modules/
 dist/
-out/
-cache/
 .idea/
 package-lock.json
