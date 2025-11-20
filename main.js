@@ -1,11 +1,9 @@
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from "electron";
-import { fileURLToPath } from "url";
 import http from "http";
 import path from "path";
 import ffmpeg from "./src/ffmpeg.js";
 import "./src/bridge.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appIcon = "assets/icons/icon.png";
 const emptyIcon = nativeImage.createEmpty();
 let mainWindow, tray;
@@ -54,7 +52,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(__dirname, "src/preload.js")
+            preload: path.join(app.getAppPath(), "src/preload.js")
         }
     });
 

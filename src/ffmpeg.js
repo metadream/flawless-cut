@@ -2,15 +2,14 @@ import path from "path";
 import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 import { execFile } from 'child_process';
-import { fileURLToPath } from "url";
 import { formatDate } from "./utils.js";
+import { app } from 'electron';
 
 // Get binary tools on different platforms
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const platform = process.platform;
 const postfix = platform == 'win32' ? '.exe' : '';
-const mediainfo = path.join(__dirname, `bin/${platform}/mediainfo` + postfix);
-const ffmpeg = path.join(__dirname, `bin/${platform}/ffmpeg` + postfix);
+const mediainfo = path.join(app.getAppPath(), `bin/${platform}/mediainfo` + postfix);
+const ffmpeg = path.join(app.getAppPath(), `bin/${platform}/ffmpeg` + postfix);
 
 /**
  * Component: Ffmpeg Tools
