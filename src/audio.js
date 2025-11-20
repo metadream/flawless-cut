@@ -1,6 +1,5 @@
 import { $ } from "./utils.js";
 
-const audioElement = $('video');
 const canvasElement = $('canvas');
 
 /**
@@ -8,7 +7,6 @@ const canvasElement = $('canvas');
  * @since 2025-11-20
  */
 export default new class Audio {
-
     constructor() {
         this.canvas = canvasElement.getContext('2d');
         this.options = {
@@ -44,7 +42,7 @@ export default new class Audio {
 
     #init() {
         const audioContext = new AudioContext();
-        const audioSource = audioContext.createMediaElementSource(audioElement);
+        const audioSource = audioContext.createMediaElementSource($('video'));
 
         this.analyser = audioContext.createAnalyser();
         audioSource.connect(this.analyser);

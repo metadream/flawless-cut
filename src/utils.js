@@ -7,6 +7,11 @@ export function $(selector) {
     return document.querySelector(selector)
 }
 
+/** Detect string is a number or not */
+export function isNumeric(string) {
+    return Number.isFinite(parseFloat(string))
+}
+
 /** Format date to pattern */
 export function formatDate(date) {
     const month = String(date.getMonth() + 1).padStart(2, 0),

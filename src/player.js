@@ -126,15 +126,15 @@ export default new class Player {
             nw.Window.get().hide();
         }
 
-        // TODO Open video segment files to merge
+        // Open video segment files to merge
         openFilesBtn.onclick = async function() {
-            const { canceled, filePaths } = await desktop.openFileDialog(true);
+            const { canceled, filePaths } = await electron.openFileDialog(true);
             if (!canceled && filePaths && filePaths.length > 1) {
                 merger.sources = filePaths;
             }
         }
 
-        // Key bindings // TODO test input
+        // Key bindings
         document.onkeyup = function(e) {
             e.preventDefault();
             if (e.target.tagName === "INPUT" || video.duration === undefined)
@@ -207,8 +207,7 @@ export default new class Player {
         if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
         if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
         if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
-        // TODO
-        document.title = nw.App.manifest.window.title + "  |  " + metadata.join(", ");
+        document.title = electron.getAppName() + '  |  ' + metadata.join(', ')
     }
 
     /** Update duration */

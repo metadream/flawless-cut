@@ -1,5 +1,9 @@
-import { dialog, ipcMain } from "electron";
+import { app, dialog, ipcMain } from "electron";
 import ffmpeg from "./ffmpeg.js";
+
+ipcMain.handle('get-app-name', () => app.getName());
+ipcMain.handle('get-app-home', () => app.getAppPath());
+ipcMain.handle('get-desktop', () => app.getPath("desktop"));
 
 ipcMain.handle("ffmpeg-media-info", ffmpeg.getMediaInfo);
 ipcMain.handle("ffmpeg-cut-video", ffmpeg.cutVideo);

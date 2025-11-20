@@ -1,11 +1,11 @@
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from "electron";
-import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import http from "http";
+import path from "path";
 import ffmpeg from "./src/ffmpeg.js";
 import "./src/bridge.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appIcon = "assets/icons/icon.png";
 const emptyIcon = nativeImage.createEmpty();
 let mainWindow, tray;
@@ -54,7 +54,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: join(__dirname, "src/preload.js")
+            preload: path.join(__dirname, "src/preload.js")
         }
     });
 
@@ -98,7 +98,7 @@ function createServer() {
     }).listen(4725);
 
     server.on('error', e => {
-        showMessage(e.message);
+        toast(e.message);
     });
 }
 

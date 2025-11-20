@@ -1,15 +1,16 @@
-import { dirname, extname, join } from "path";
+import path from "path";
+import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 import { execFile } from 'child_process';
 import { fileURLToPath } from "url";
 import { formatDate } from "./utils.js";
 
 // Get binary tools on different platforms
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const platform = process.platform;
 const postfix = platform == 'win32' ? '.exe' : '';
-const mediainfo = join(__dirname, `bin/${platform}/mediainfo` + postfix);
-const ffmpeg = join(__dirname, `bin/${platform}/ffmpeg` + postfix);
+const mediainfo = path.join(__dirname, `bin/${platform}/mediainfo` + postfix);
+const ffmpeg = path.join(__dirname, `bin/${platform}/ffmpeg` + postfix);
 
 /**
  * Component: Ffmpeg Tools
@@ -19,10 +20,10 @@ export default new class Ffmpeg {
 
     /** Get metadata of media */
     getMediaInfo(videoPath) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             execFile(mediainfo, [videoPath, '--Output=JSON'], (error, stdout) => {
                 if (error) {
-                    toast('Get media information failed');
+                    reject(new Error('Get media information failed'));
                     return;
                 }
                 if (stdout.trim()) {
@@ -79,7 +80,7 @@ export default new class Ffmpeg {
 
     /** Merge all videos to one */
     mergeVideos(videoPaths) {
-        const outputFile = videoPaths[0] + '-merged' + extname(videoPaths[0]);
+        const outputFile = videoPaths[0] + '-merged' + path.extname(videoPaths[0]);
         const process = this.#ffmpegCommand([
             '-f', 'concat', '-safe', '0', '-protocol_whitelist', 'file,pipe',
             '-i', '-', '-c', 'copy', '-y', outputFile
@@ -128,33 +129,34 @@ export default new class Ffmpeg {
 
     /** Execute ffmpeg binary */
     #ffmpegCommand(args, options) {
-        loading(true);  // TODO 无法调用渲染层
+        const emitter = new EventEmitter();
+        emitter.emit('start');
+
         const process = execFile(ffmpeg, args, options, (error, _stdout, stderr) => {
             if (stderr instanceof Buffer) return;
-
-            loading(false);
             if (error) {
                 error = error.toString().trim();
                 error = error.substring(error.lastIndexOf('\n') + 1);
                 error = error.substring(error.lastIndexOf(':') + 1);
-                toast(error);  // TODO 无法调用渲染层
+                emitter.emit('error', error);
+            } else {
+                emitter.emit('finish');
             }
         });
 
         process.stderr.on('data', stderr => {
             const match = / time\=(\d{2}:\d{2}:\d{2}\.\d{2,3}) /.exec(stderr);
             if (match) {
-                process.ontimeupdate && process.ontimeupdate(match[1]);
-
+                emitter.emit('timeupdate', match[1]);
                 const index = args.indexOf('-t');
                 if (index > -1) {
                     const duration = args[index + 1];
                     const progress = Math.round((parseDuration(match[1]) / duration) * 100);
-                    loading(progress);
+                    emitter.emit('progress', progress);
                 }
             }
         });
-        return process;
+        return Object.assign(process, { emitter });
     }
 
     /** Get audio device */
@@ -179,8 +181,7 @@ export default new class Ffmpeg {
         const start = parseDuration(startTime);
         const end = parseDuration(endTime);
         if (start >= end) {
-            toast('Start time cannot be later than end time');
-            return false;
+            throw new Error('Start time cannot be later than end time');
         }
         return {
             start, duration: end - start
@@ -190,6 +191,6 @@ export default new class Ffmpeg {
     /** Format filename */
     #formatOutputFile(videoPath, startTime, endTime, extname) {
         const suffix = ('-' + startTime + '-' + endTime).replace(/:/g, '.');
-        return videoPath + suffix + (extname || extname(videoPath));
+        return videoPath + suffix + (extname || path.extname(videoPath));
     }
 }

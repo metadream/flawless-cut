@@ -1,5 +1,4 @@
-// import { isNumeric, showLoading, showMessage } from "./preload.js";  // TODO
-import { $ } from "./utils.js";
+import { $, isNumeric } from "./utils.js";
 import player from "./player.js";
 
 const fileChooser = $('#file-chooser');
@@ -18,13 +17,13 @@ export default new class Video {
     constructor() {
         video.onloadstart = async () => {
             this.metadata = await ffmpeg.getMediaInfo(video.src);
-            showLoading(true);
+            loading(true);
         }
 
         video.onloadedmetadata = () => {
             fileChooser.style.opacity = 0;
             player.enableControls(true);
-            showLoading(false);
+            loading(false);
         }
 
         video.oncanplay = () => {
@@ -46,10 +45,10 @@ export default new class Video {
             if (this.transcoded) {
                 fileChooser.style.opacity = 1;
                 player.enableControls(false);
-                showLoading(false);
-                showMessage('Unsupported video format');
+                loading(false);
+                toast('Unsupported video format');
             } else {
-                showMessage('This video needs transcoding, playback will be slower');
+                toast('This video needs transcoding, playback will be slower');
                 this.transcode();
             }
         }

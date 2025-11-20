@@ -24,7 +24,7 @@ fileChooser.ondrop = function(e) {
 
 /** Choose to play */
 fileChooser.onclick = async function() {
-    const { canceled, filePaths } = await desktop.openFileDialog();
+    const { canceled, filePaths } = await electron.openFileDialog();
     if (!canceled && filePaths && filePaths.length == 1) {
         player.source = filePaths[0];
     }

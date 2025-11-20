@@ -1,4 +1,3 @@
-const outputPath = "";  // require('@electron/remote').getGlobal('desktop') // TODO 同级目录
 import { $ } from "./utils.js";
 
 /**
@@ -20,14 +19,14 @@ export default new class Recorder {
         this.stopBtn = this.container.querySelector('button.stop')
         document.body.appendChild(this.container)
 
-        this.container.onclick = e => this.onmaskclick(e)
+        this.container.onclick = e => this.onMaskClick(e)
         this.startBtn.onclick = () => this.createProcess()
         this.stopBtn.onclick = () => this.exitProcess()
     }
 
     async createProcess() {
         this.startBtn.disabled = true
-        this.process = await ffmpeg.recordVideo(outputPath)
+        this.process = await ffmpeg.recordVideo(electron.getDesktop());
 
         this.process.ontimeupdate = res => {
             this.duration.innerHTML = res
@@ -36,7 +35,7 @@ export default new class Recorder {
                 this.startBtn.style.display = 'none'
                 this.stopBtn.style.display = 'block'
                 this.container.onclick = null
-                desktop.createTray();
+                electron.createTray();
             }
         }
         this.process.on('exit', () => {
@@ -44,16 +43,16 @@ export default new class Recorder {
             this.startBtn.disabled = false
             this.startBtn.style.display = 'block'
             this.stopBtn.style.display = 'none'
-            this.container.onclick = e => this.onmaskclick(e)
+            this.container.onclick = e => this.onMaskClick(e)
         })
     }
 
     exitProcess() {
         this.process.stdin.write('q')
-        desktop.removeTray();
+        electron.removeTray();
     }
 
-    onmaskclick(e) {
+    onMaskClick(e) {
         if (e.currentTarget === e.target) {
             this.container.classList.remove('visible')
         }

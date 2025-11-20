@@ -5,7 +5,6 @@ import { $ } from "./utils.js";
  * @since 2025-11-20
  */
 export default new class Merger {
-
     constructor() {
         this.container = $(`
             <div class="merger">
@@ -20,20 +19,21 @@ export default new class Merger {
         `);
 
         this.fileList = this.container.querySelector('ol');
-        this.mergeBtn = this.container.querySelector('button.merge');
-        this.cancelBtn = this.container.querySelector('button.cancel');
+        const mergeBtn = this.container.querySelector('button.merge');
+        const cancelBtn = this.container.querySelector('button.cancel');
         document.body.appendChild(this.container);
 
-        this.mergeBtn.onclick = () => {
-            this.mergeVideos();
+        mergeBtn.onclick = () => {
+            const proc = ffmpeg.mergeVideos(this.filePaths);
+            proc.emitter.on('start', () => loading(true));
+            proc.emitter.on('finish', () => loading(false));
+            proc.emitter.on('progress', p => loading(p));
+            proc.emitter.on('error', e => toast(e.message));
         }
-        this.cancelBtn.onclick = () => {
+
+        cancelBtn.onclick = () => {
             this.container.style.display = 'none';
         }
-    }
-
-    mergeVideos() {
-        ffmpeg.mergeVideos(this.filePaths);
     }
 
     set sources(filePaths) {

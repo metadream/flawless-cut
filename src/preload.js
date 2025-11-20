@@ -1,9 +1,12 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("desktop", {
-    openFileDialog: (multiple = false) => ipcRenderer.invoke("open-file-dialog", multiple),
+contextBridge.exposeInMainWorld('electron', {
+    getAppName: () => ipcRenderer.invoke('get-app-name'),
+    getAppHome: () => ipcRenderer.invoke('get-app-home'),
+    getDesktop: () => ipcRenderer.invoke('get-desktop'),
     createTray: () => ipcRenderer.invoke("create-tray"),
-    removeTray: () => ipcRenderer.invoke("remove-tray")
+    removeTray: () => ipcRenderer.invoke("remove-tray"),
+    openFileDialog: (multiple = false) => ipcRenderer.invoke("open-file-dialog", multiple)
 });
 
 contextBridge.exposeInMainWorld("ffmpeg", {
