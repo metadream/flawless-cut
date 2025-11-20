@@ -1,6 +1,10 @@
 const outputPath = "";  // require('@electron/remote').getGlobal('desktop') // TODO 同级目录
 import { $ } from "./utils.js";
 
+/**
+ * Component: Recorder Component
+ * @since 2025-11-20
+ */
 export default new class Recorder {
     constructor() {
         this.container = $(`

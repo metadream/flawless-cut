@@ -1,6 +1,14 @@
 import { dialog, ipcMain } from "electron";
 import ffmpeg from "./ffmpeg.js";
 
+ipcMain.handle("ffmpeg-media-info", ffmpeg.getMediaInfo);
+ipcMain.handle("ffmpeg-cut-video", ffmpeg.cutVideo);
+ipcMain.handle("ffmpeg-convert-video", ffmpeg.convertVideo);
+ipcMain.handle("ffmpeg-record-video", ffmpeg.recordVideo);
+ipcMain.handle("ffmpeg-merge-videos", ffmpeg.mergeVideos);
+ipcMain.handle("ffmpeg-extract-audio", ffmpeg.extractAudio);
+ipcMain.handle("ffmpeg-capture-image", ffmpeg.captureImage);
+
 ipcMain.handle("open-file-dialog", (multiple = false) => {
     return dialog.showOpenDialog({
         properties: ["openFile", multiple ? "multiSelections" : false],
@@ -15,11 +23,3 @@ ipcMain.handle("open-file-dialog", (multiple = false) => {
         }]
     });
 });
-
-ipcMain.handle("ffmpeg-media-info", ffmpeg.getMediaInfo);
-ipcMain.handle("ffmpeg-cut-video", ffmpeg.cutVideo);
-ipcMain.handle("ffmpeg-convert-video", ffmpeg.convertVideo);
-ipcMain.handle("ffmpeg-record-video", ffmpeg.recordVideo);
-ipcMain.handle("ffmpeg-merge-videos", ffmpeg.mergeVideos);
-ipcMain.handle("ffmpeg-extract-audio", ffmpeg.extractAudio);
-ipcMain.handle("ffmpeg-capture-image", ffmpeg.captureImage);

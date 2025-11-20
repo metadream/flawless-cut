@@ -28,7 +28,7 @@ const openRecordBtn = $(".open-record");
 const openFilesBtn = $(".open-files");
 
 /**
- * Component: Player Controls
+ * Component: Player Component
  * @since 2025-11-20
  */
 export default new class Player {

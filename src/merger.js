@@ -1,5 +1,9 @@
 import { $ } from "./utils.js";
 
+/**
+ * Component: Merger Component
+ * @since 2025-11-20
+ */
 export default new class Merger {
 
     constructor() {
