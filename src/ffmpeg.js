@@ -22,7 +22,7 @@ export default new class Ffmpeg {
         return new Promise(resolve => {
             execFile(mediainfo, [videoPath, '--Output=JSON'], (error, stdout) => {
                 if (error) {
-                    alert('Get media information failed');
+                    toast('Get media information failed');
                     return;
                 }
                 if (stdout.trim()) {
@@ -107,7 +107,7 @@ export default new class Ffmpeg {
 
     /** Capture image from current frame of video */
     captureImage(video) {
-        const currentTime = formatDuration(video.getCurrentTime());
+        const currentTime = formatDuration(video.currentTime);
         const outputFile = this.#formatOutputFile(video.source, currentTime, 1, '.jpg');
         return this.#ffmpegCommand([
             '-ss', currentTime, '-i', video.source, '-vframes', 1,
@@ -128,7 +128,7 @@ export default new class Ffmpeg {
 
     /** Execute ffmpeg binary */
     #ffmpegCommand(args, options) {
-        loading(true);
+        loading(true);  // TODO 无法调用渲染层
         const process = execFile(ffmpeg, args, options, (error, _stdout, stderr) => {
             if (stderr instanceof Buffer) return;
 
@@ -137,7 +137,7 @@ export default new class Ffmpeg {
                 error = error.toString().trim();
                 error = error.substring(error.lastIndexOf('\n') + 1);
                 error = error.substring(error.lastIndexOf(':') + 1);
-                toast(error);
+                toast(error);  // TODO 无法调用渲染层
             }
         });
 
@@ -179,7 +179,7 @@ export default new class Ffmpeg {
         const start = parseDuration(startTime);
         const end = parseDuration(endTime);
         if (start >= end) {
-            alert('Start time cannot be later than end time');
+            toast('Start time cannot be later than end time');
             return false;
         }
         return {

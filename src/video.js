@@ -1,30 +1,23 @@
-import { isNumeric, showLoading, showMessage } from "./preload.js";
-import { Player } from "./player.js";
-import audio from "./audio.js";
-import ffmpeg from "./ffmpeg.js";
+// import { isNumeric, showLoading, showMessage } from "./preload.js";  // TODO
+import { $ } from "./utils.js";
+import player from "./player.js";
 
-const http = require("node:http");
 const fileChooser = $('#file-chooser');
 const video = $('video');
-const serverPort = 4725;
-let player = null;
 
 /**
- * Component: Video Object
- * @since 2025-08-15
+ * Component: Video Component
+ * @since 2025-11-20
  */
-export class Video {
+export default new class Video {
 
-    filePath = null;
     metadata = null;
-    server = null;
     transcoded = false;
     startTime = 0;
 
     constructor() {
-        player = new Player(this);
-
-        video.onloadstart = function() {
+        video.onloadstart = async () => {
+            this.metadata = await ffmpeg.getMediaInfo(video.src);
             showLoading(true);
         }
 
@@ -35,7 +28,7 @@ export class Video {
         }
 
         video.oncanplay = () => {
-            if (player.isPaused()) {  // TODO 是否可去掉此判断
+            if (player.paused) {  // TODO 是否可去掉此判断
                 video.play();
             }
         }
@@ -46,7 +39,7 @@ export class Video {
 
         video.onended = () => {
             video.pause();
-            player.setStatus('play');
+            player.status = 'play';
         }
 
         video.onerror = () => {
@@ -66,14 +59,13 @@ export class Video {
         if (!this.transcoded) {
             this.transcoded = true;
             this.seek(0);
-            this.createServer();
         }
     }
 
     seek(timestamp) {
         if (!isNumeric(timestamp)) return;
         if (timestamp < 0) timestamp = 0;
-        else if (timestamp > this.getDuration()) timestamp = this.getDuration();
+        else if (timestamp > this.duration) timestamp = this.duration;
 
         if (this.transcoded) {
             this.startTime = timestamp;
@@ -83,36 +75,7 @@ export class Video {
         }
     }
 
-    async setPath(filePath) {
-        video.src = 'file://' + filePath;
-        this.filePath = filePath;
-        this.transcoded = false;
-        this.startTime = 0;
-        player.resetControls();
-        player.enableControls(false);
-
-        this.metadata = await ffmpeg.getMediaInfo(filePath);
-        if (this.getDuration()) {
-            player.updateDuration();
-            player.displayMetadata();
-        }
-
-        if (this.getMetadata('Audio') && !this.getMetadata('Video')) {
-            audio.play();
-        } else {
-            audio.pause();
-            audio.hide();
-        }
-    }
-
-    getCurrentTime() {
-        return video.currentTime + this.startTime;
-    }
-
-    getDuration() {
-        return this.getMetadata('General.Duration');
-    }
-
+    // TODO cache
     getMetadata(key) {
         let i = 0, value = this.metadata;
         key = key.split('.');
@@ -123,34 +86,21 @@ export class Video {
         return isNumeric(value) ? Number(value) : value;
     }
 
-    createServer() {
-        if (this.server && this.server.listening) return;
-
-        this.server = http.createServer((request, response) => {
-            const url = new URL(request.url, `http://${request.headers.host}`);
-            const params = Object.fromEntries(url.searchParams);
-            const ffProc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
-            ffProc.stdout.pipe(response);
-
-            request.on('close', () => {
-                ffProc.stdout.destroy();
-                ffProc.stderr.destroy();
-                ffProc.kill();
-            });
-        }).listen(serverPort);
-
-        this.server.on('error', e => {
-            showMessage(e.message);
-        });
-    }
-
     /** Extends original video properties and methods  */
     play() { video.play(); }
 
     pause() { video.pause(); }
 
+    set src(path) { video.src = path; }
+
+    get src() { return video.src; }
+
     get paused() { return video.paused; }
 
     get ended() { return video.ended; }
+
+    get currentTime() { return video.currentTime + this.startTime; }
+
+    get duration() { return this.getMetadata('General.Duration'); }
 
 }

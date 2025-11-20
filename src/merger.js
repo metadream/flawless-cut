@@ -1,7 +1,6 @@
-const { basename } = require('node:path');
-import ffmpeg from "./ffmpeg.js";
+import { $ } from "./utils.js";
 
-export class Merger {
+export default new class Merger {
 
     constructor() {
         this.container = $(`
@@ -30,15 +29,16 @@ export class Merger {
     }
 
     mergeVideos() {
-        ffmpeg.mergeVideos(video.sources);
+        ffmpeg.mergeVideos(this.filePaths);
     }
 
-    setFileList(filePaths) {
+    set sources(filePaths) {
+        this.filePaths = filePaths;
         this.container.style.display = 'flex';
         this.fileList.innerHTML = '';
 
         filePaths.forEach(filePath => {
-            this.fileList.appendChild($('<li>' + basename(filePath) + '</li>'));
+            this.fileList.appendChild($('<li>' + (filePath) + '</li>'));
         });
     }
 

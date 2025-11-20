@@ -1,7 +1,13 @@
+import { $ } from "./utils.js";
+
 const audioElement = $('video');
 const canvasElement = $('canvas');
 
-export default new class {
+/**
+ * Component: Audio Component
+ * @since 2025-11-20
+ */
+export default new class Audio {
 
     constructor() {
         this.canvas = canvasElement.getContext('2d');
@@ -17,14 +23,14 @@ export default new class {
         };
 
         this.playing = false;
-        this._init();
+        this.#init();
     }
 
     play() {
         if (!this.playing) {
             this.playing = true;
             canvasElement.style.display = 'block';
-            this._dance();
+            this.#wave();
         }
     }
 
@@ -36,7 +42,7 @@ export default new class {
         canvasElement.style.display = 'none';
     }
 
-    _init() {
+    #init() {
         const audioContext = new AudioContext();
         const audioSource = audioContext.createMediaElementSource(audioElement);
 
@@ -52,15 +58,15 @@ export default new class {
         this.canvas.scale(dpr, dpr);
     }
 
-    _dance() {
+    #wave() {
         if (this.playing) {
             this.analyser.getByteFrequencyData(this.freqByteData);
-            this._visualize(this.freqByteData);
-            requestAnimationFrame(() => this._dance());
+            this.#visualize(this.freqByteData);
+            requestAnimationFrame(() => this.#wave());
         }
     }
 
-    _visualize(freqByteData) {
+    #visualize(freqByteData) {
         const o = this.options;
         this.canvas.clearRect(0, 0, o.width, o.height);
 

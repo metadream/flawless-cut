@@ -19,14 +19,14 @@ fileChooser.ondragleave = function(e) {
 }
 fileChooser.ondrop = function(e) {
     e.preventDefault();
-    player.setSource(e.dataTransfer.files[0].path);
+    player.source = e.dataTransfer.files[0].path;
 }
 
 /** Choose to play */
 fileChooser.onclick = async function() {
     const { canceled, filePaths } = await desktop.openFileDialog();
     if (!canceled && filePaths && filePaths.length == 1) {
-        player.setSource(filePaths[0]);
+        player.source = filePaths[0];
     }
 }
 

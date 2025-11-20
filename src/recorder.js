@@ -1,16 +1,15 @@
-const electron = require('electron')
-const outputPath = require('@electron/remote').getGlobal('desktop')
-const ffmpeg = require('./ffmpeg')
+const outputPath = "";  // require('@electron/remote').getGlobal('desktop') // TODO 同级目录
+import { $ } from "./utils.js";
 
-module.exports = class {
+export default new class Recorder {
     constructor() {
         this.container = $(`
-      <div class="recorder"><div>
-        <div class="duration">00:00:00.00</div>
-        <button class="start">Start</button>
-        <button class="stop">Stop</button>
-      </div></div>
-    `)
+            <div class="recorder"><div>
+                <div class="duration">00:00:00.00</div>
+                <button class="start">Start</button>
+                <button class="stop">Stop</button>
+            </div></div>
+        `)
 
         this.duration = this.container.querySelector('.duration')
         this.startBtn = this.container.querySelector('button.start')
@@ -33,7 +32,7 @@ module.exports = class {
                 this.startBtn.style.display = 'none'
                 this.stopBtn.style.display = 'block'
                 this.container.onclick = null
-                electron.ipcRenderer.send('create-tray')
+                desktop.createTray();
             }
         }
         this.process.on('exit', () => {
@@ -47,7 +46,7 @@ module.exports = class {
 
     exitProcess() {
         this.process.stdin.write('q')
-        electron.ipcRenderer.send('remove-tray')
+        desktop.removeTray();
     }
 
     onmaskclick(e) {

@@ -1,121 +1,124 @@
 import { $, formatDuration, parseDuration } from "./utils.js";
-import { Merger } from "./merger.js";
+import video from "./video.js";
+import merger from "./merger.js";
+import audio from "./audio.js";
+import recorder from "./recorder.js";
 
-const timeline = $('.timeline');
-const currentTime = $('#currentTime');
-const duration = $('#duration');
-const segment = $('#segment');
-const progress = $('#progress');
-const segmentStartTime = $('#segment-start-time');
-const segmentEndTime = $('#segment-end-time');
+const timeline = $(".timeline");
+const currentTime = $("#currentTime");
+const duration = $("#duration");
+const segment = $("#segment");
+const progress = $("#progress");
+const segmentStartTime = $("#segment-start-time");
+const segmentEndTime = $("#segment-end-time");
 
-const playBtn = $('.play');
-const videoStartBtn = $('.video-start');
-const videoEndBtn = $('.video-end');
-const segmentStartBtn = $('.segment-start');
-const segmentEndBtn = $('.segment-end');
-const cutStartBtn = $('.cut-start');
-const cutEndBtn = $('.cut-end');
+const playBtn = $(".play");
+const videoStartBtn = $(".video-start");
+const videoEndBtn = $(".video-end");
+const segmentStartBtn = $(".segment-start");
+const segmentEndBtn = $(".segment-end");
+const cutStartBtn = $(".cut-start");
+const cutEndBtn = $(".cut-end");
 
-const cutBtn = $('.cut');
-const captureBtn = $('.capture');
-const extractBtn = $('.extract');
-const convertBtn = $('.convert');
-const openRecordBtn = $('.open-record');
-const openFilesBtn = $('.open-files');
-
-let video = null;
-const merger = new Merger();
-
-// const recorder = new Recorder();
+const cutBtn = $(".cut");
+const captureBtn = $(".capture");
+const extractBtn = $(".extract");
+const convertBtn = $(".convert");
+const openRecordBtn = $(".open-record");
+const openFilesBtn = $(".open-files");
 
 /**
  * Component: Player Controls
- * @since 2025-08-15
+ * @since 2025-11-20
  */
-export class Player {
+export default new class Player {
 
-    constructor(_video) {
-        video = _video;
-
+    constructor() {
         playBtn.onclick = () => {
             if (video.paused) {
                 if (video.ended) video.seek(0);
                 video.play();
-                this.setPlayStatus('pause');
+                this.status = "pause";
             } else {
                 video.pause();
-                this.setPlayStatus('play');
+                this.status = "play";
             }
         }
 
+        // Create video segment by cut buttons
         cutStartBtn.onclick = () => {
-            segmentStartTime.value = formatDuration(video.getCurrentTime());
+            segmentStartTime.value = formatDuration(video.currentTime);
             this.createSegment();
         }
-
         cutEndBtn.onclick = () => {
-            segmentEndTime.value = formatDuration(video.getCurrentTime());
+            segmentEndTime.value = formatDuration(video.currentTime);
             this.createSegment();
         }
 
+        // Seek to the beginning or end of the segment
         segmentStartBtn.onclick = () => {
             video.seek(parseDuration(segmentStartTime.value));
         }
-
         segmentEndBtn.onclick = () => {
             video.seek(parseDuration(segmentEndTime.value));
         }
 
+        // Seek to the beginning or end of the video
         videoStartBtn.onclick = () => {
             video.seek(0);
         }
-
         videoEndBtn.onclick = () => {
-            video.seek(video.getDuration());
+            video.seek(video.duration);
         }
 
+        // Seek to timeline position
         timeline.onclick = function(e) {
-            if (video.getDuration() !== undefined) {
-                video.seek(video.getDuration() * (e.clientX / this.offsetWidth));
+            if (video.duration !== undefined) {
+                video.seek(video.duration * (e.clientX / this.offsetWidth));
             }
         }
 
+        // Create segment by input time
         const self = this;
         segmentStartTime.oninput = segmentEndTime.oninput = function() {
             video.seek(parseDuration(this.value));
             self.createSegment();
         }
 
+        // Take a snapshot of current frame from the video
         captureBtn.onclick = function() {
             ffmpeg.captureImage(video);
         }
 
+        // Extract audio from the video segment
         extractBtn.onclick = () => {
-            ffmpeg.extractAudio(video, this.getSegmentStartTime(), this.getSegmentEndTime());
+            ffmpeg.extractAudio(video, this.segmentStartTime, this.segmentEndTime);
         }
 
+        // Re-encode video segment to regular MP4 and export
         convertBtn.onclick = () => {
-            ffmpeg.convertVideo(video.filePath, this.getSegmentStartTime(), this.getSegmentEndTime());
+            ffmpeg.convertVideo(video.src, this.segmentStartTime, this.segmentEndTime);
         }
 
+        // Lossless cut video segment and export
         cutBtn.onclick = () => {
-            ffmpeg.cutVideo(video.filePath, this.getSegmentStartTime(), this.getSegmentEndTime());
+            ffmpeg.cutVideo(video.src, this.segmentStartTime, this.segmentEndTime);
         }
 
+        // TODO Record screen
         openRecordBtn.onclick = function() {
-            // recorder.show();
-            var tray = new nw.Tray({ title: 'Tray', icon: 'img/icon.png' });
+            recorder.show();
+            var tray = new nw.Tray({ title: "Tray", icon: "img/icon.png" });
 
             // Give it a menu
             var menu = new nw.Menu();
             menu.append(new nw.MenuItem({
-                // label: 'box1', click: function() {
+                // label: "box1", click: function() {
                 //     nw.Window.get().show();
                 // }
                 label: "Click me",
                 click: function() {
-                    console.log("I'm clicked");
+                    console.log("Im clicked");
                 }
             }));
             tray.menu = menu;
@@ -123,54 +126,52 @@ export class Player {
             nw.Window.get().hide();
         }
 
+        // TODO Open video segment files to merge
         openFilesBtn.onclick = async function() {
-            const { canceled, filePaths } = await openFileDialog(true); // TODO
+            const { canceled, filePaths } = await desktop.openFileDialog(true);
             if (!canceled && filePaths && filePaths.length > 1) {
-                video.sources = filePaths;
-                merger.setFileList(filePaths);
+                merger.sources = filePaths;
             }
         }
 
+        // Key bindings // TODO test input
         document.onkeyup = function(e) {
             e.preventDefault();
-            if (video.getDuration() === undefined) return;
-            if (e.code === 'Space') return playBtn.onclick();
-            if (e.code === 'ArrowLeft') return video.seek(video.getCurrentTime() - 1);
-            if (e.code === 'ArrowRight') return video.seek(video.getCurrentTime() + 1);
+            if (e.target.tagName === "INPUT" || video.duration === undefined)
+                return;
+
+            switch (e.code) {
+                case "Space":
+                    playBtn.onclick();
+                    break;
+                case "ArrowLeft":
+                    video.seek(video.currentTime - 1);
+                    break;
+                case "ArrowRight":
+                    video.seek(video.currentTime + 1);
+                    break;
+            }
         }
     }
 
+    /** Create segment by start and end time */
     createSegment() {
-        segment.style.left = (parseDuration(segmentStartTime.value) / video.getDuration()) * 100 + '%';
-        segment.style.right = (100 - (parseDuration(segmentEndTime.value) / video.getDuration()) * 100) + '%';
+        segment.style.left = (parseDuration(segmentStartTime.value) / video.duration) * 100 + "%";
+        segment.style.right = (100 - (parseDuration(segmentEndTime.value) / video.duration) * 100) + "%";
     }
 
-    setPlayStatus(v) {
-        playBtn.className = v;
-    }
-
-    isPaused() {
-        return playBtn.className === 'play';
-    }
-
-    getSegmentStartTime() {
-        return segmentStartTime.value;
-    }
-
-    getSegmentEndTime() {
-        return segmentEndTime.value;
-    }
-
+    /** Reset controls */
     resetControls() {
-        this.setPlayStatus('play');
+        this.status = "play";
         progress.style.left = 0;
         segment.style.left = 0;
-        segment.style.right = '100%';
-        duration.innerHTML = '00:00:00.000';
-        segmentStartTime.value = '00:00:00.000';
-        segmentEndTime.value = '00:00:00.000';
+        segment.style.right = "100%";
+        duration.innerHTML = "00:00:00.000";
+        segmentStartTime.value = "00:00:00.000";
+        segmentEndTime.value = "00:00:00.000";
     }
 
+    /** Enable controls */
     enableControls(v) {
         v = !v;
         playBtn.disabled = v;
@@ -189,27 +190,60 @@ export class Player {
         convertBtn.disabled = v;
     }
 
+    /** Update timeline */
     updateTimeline() {
-        const time = video.getCurrentTime();
-        currentTime.innerHTML = formatDuration(time);
-        progress.style.left = (time / video.getDuration()) * 100 + '%';
+        currentTime.innerHTML = formatDuration(video.currentTime);
+        progress.style.left = (video.currentTime / video.duration) * 100 + "%";
     }
 
+    /** Display metadata on the panel */
     displayMetadata() {
-        const format = video.getMetadata('General.Format') || '';
-        const frameRate = video.getMetadata('General.FrameRate');
-        const bitRate = video.getMetadata('General.OverallBitRate');
-        const samplingRate = video.getMetadata('Audio.SamplingRate');
+        const format = video.getMetadata("General.Format") || "";
+        const frameRate = video.getMetadata("General.FrameRate");
+        const bitRate = video.getMetadata("General.OverallBitRate");
+        const samplingRate = video.getMetadata("Audio.SamplingRate");
 
         const metadata = [format];
-        if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + 'fps');
-        if (bitRate) metadata.push(Math.round(bitRate / 1000) + 'kbps');
-        if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + 'kHz');
-        document.title = nw.App.manifest.window.title + '  |  ' + metadata.join(', ');
+        if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
+        if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
+        if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
+        // TODO
+        document.title = nw.App.manifest.window.title + "  |  " + metadata.join(", ");
     }
 
+    /** Update duration */
     updateDuration() {
-        duration.innerHTML = segmentEndTime.value = formatDuration(video.getDuration());
+        duration.innerHTML = segmentEndTime.value = formatDuration(video.duration);
     }
+
+    /** Set filepath to video source */
+    set source(filePath) {
+        video.src = filePath;
+        video.startTime = 0;
+        video.transcoded = false;
+
+        this.resetControls();
+        this.enableControls(false);
+
+        if (video.duration) {
+            this.updateDuration();
+            this.displayMetadata();
+        }
+
+        if (video.getMetadata("Audio") && !video.getMetadata("Video")) {
+            audio.play();
+        } else {
+            audio.pause();
+            audio.hide();
+        }
+    }
+
+    set status(v) { playBtn.className = v; }
+
+    get paused() { return playBtn.className === "play"; }
+
+    get segmentStartTime() { return segmentStartTime.value; }
+
+    get segmentEndTime() { return segmentEndTime.value; }
 
 }
