@@ -18,17 +18,13 @@
         "appId": "flawless-cut",
         "productName": "Flawless Cut",
         "win": {
-            "target": [
-                "nsis"
-            ]
+            "target": [ "nsis" ]
         },
         "linux": {
-            "target": [
-                "deb"
-            ]
+            "target": [ "deb" ]
         },
         "mac": {
-            "target": "dmg",
+            "target": [ "dmg" ],
             "icon": "assets/icons/icon.icns",
             "category": "public.app-category.productivity",
             "extendInfo": {
