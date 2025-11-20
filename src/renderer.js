@@ -1,46 +1,36 @@
-// import { Video } from "./video.js";
 import { $ } from "./utils.js";
+import player from "./player.js";
 
 const fileChooser = $('#file-chooser');
 const toast = $('.toast');
 const loading = $('.loading');
 
-// const video = new Video();
-
-/* --------------------------------------------------------
- * Open file events
- * ----------------------------------------------------- */
-
+/** Drag to play */
 fileChooser.ondragover = function() {
     return false;
 }
-
 fileChooser.ondragenter = function(e) {
     e.preventDefault();
     this.classList.add('ondrag');
 }
-
 fileChooser.ondragleave = function(e) {
     e.preventDefault();
     this.classList.remove('ondrag');
 }
-
 fileChooser.ondrop = function(e) {
     e.preventDefault();
-    video.setPath(e.dataTransfer.files[0].path);
+    player.setSource(e.dataTransfer.files[0].path);
 }
 
+/** Choose to play */
 fileChooser.onclick = async function() {
-    const { canceled, filePaths } = await bridge.openFileDialog();
+    const { canceled, filePaths } = await desktop.openFileDialog();
     if (!canceled && filePaths && filePaths.length == 1) {
-        video.setPath(filePaths[0]);
+        player.setSource(filePaths[0]);
     }
 }
 
-/* --------------------------------------------------------
- * Web Components
- * ----------------------------------------------------- */
-
+/** Web components */
 Object.assign(window, {
     toast(text) {
         toast.message = toast.querySelector('div');

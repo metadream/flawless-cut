@@ -39,8 +39,5 @@
     "devDependencies": {
         "electron": "^39.2.2",
         "electron-builder": "^26.0.12"
-    },
-    "dependencies": {
-        "string-to-stream": "^3.0.1"
     }
 }

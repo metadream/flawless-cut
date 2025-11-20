@@ -1,18 +1,47 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, Tray } from "electron";
-import { fileURLToPath } from "url";
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from "electron";
 import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import http from "http";
+import ffmpeg from "./src/ffmpeg.js";
+import "./src/bridge.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const appIcon = "assets/icons/icon.png";
 const emptyIcon = nativeImage.createEmpty();
 let mainWindow, tray;
 
-/* --------------------------------------------------------
- * Create Main Window
- * ----------------------------------------------------- */
+/** Singleton application instance */
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) { app.quit() } else {
+    // Someone tried to run a second instance, we should focus our window.
+    app.on("second-instance", (_event, _commandLine, _workingDirectory) => {
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+        }
+    });
 
+    // This method will be called when Electron has finished
+    // initialization and is ready to create browser windows.
+    // Some APIs can only be used after this event occurs.
+    app.whenReady().then(() => {
+        createWindow();
+        app.on("activate", function() {
+            // On macOS it's common to re-create a window in the app when the
+            // dock icon is clicked and there are no other windows open.
+            if (mainWindow === null) createWindow();
+        });
+    });
+
+    // Quit when all windows are closed.
+    app.on("window-all-closed", function() {
+        // On macOS it's common for applications and their menu bar
+        // to stay active until the user quits explicitly with Cmd + Q
+        if (process.platform !== "darwin") app.quit();
+    });
+}
+
+/** Create main window */
 function createWindow() {
     // Hide the menu of application
     Menu.setApplicationMenu(null);
@@ -48,63 +77,32 @@ function createWindow() {
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null;
-    })
+    });
+
+    createServer();
 }
 
-/* --------------------------------------------------------
- * Init Application Instance
- * ----------------------------------------------------- */
+/** Create video transcode server */
+function createServer() {
+    const server = http.createServer((request, response) => {
+        const url = new URL(request.url, `http://${request.headers.host}`);
+        const params = Object.fromEntries(url.searchParams);
+        const ffProc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
+        ffProc.stdout.pipe(response);
 
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) { app.quit() } else {
+        request.on('close', () => {
+            ffProc.stdout.destroy();
+            ffProc.stderr.destroy();
+            ffProc.kill();
+        });
+    }).listen(4725);
 
-    // Someone tried to run a second instance, we should focus our window.
-    app.on("second-instance", (_event, _commandLine, _workingDirectory) => {
-        if (mainWindow) {
-            if (mainWindow.isMinimized()) mainWindow.restore();
-            mainWindow.focus();
-        }
+    server.on('error', e => {
+        showMessage(e.message);
     });
-
-    // This method will be called when Electron has finished
-    // initialization and is ready to create browser windows.
-    // Some APIs can only be used after this event occurs.
-    app.on("ready", createWindow);
-
-    // Quit when all windows are closed.
-    app.on("window-all-closed", function() {
-        // On macOS it's common for applications and their menu bar
-        // to stay active until the user quits explicitly with Cmd + Q
-        if (process.platform !== "darwin") app.quit();
-    });
-
-    app.on("activate", function() {
-        // On macOS it's common to re-create a window in the app when the
-        // dock icon is clicked and there are no other windows open.
-        if (mainWindow === null) createWindow();
-    });
-
 }
 
-/* --------------------------------------------------------
- * IPC APIs
- * ----------------------------------------------------- */
-
-ipcMain.handle("open-file-dialog", (multiple = false) => {
-    return dialog.showOpenDialog({
-        properties: ["openFile", multiple ? "multiSelections" : false],
-        filters: [{
-            name: "Media Files", extensions: [
-                "3gp", "asf", "avi", "dat", "flv",
-                "mkv", "mov", "mp4", "mpg", "mpeg", "ogg", "rm", "rmvb", "vob", "wmv",
-                "aac", "ape", "alac", "flac", "mp3", "wav"
-            ]
-        }, {
-            name: "All Files", extensions: ["*"]
-        }]
-    });
-});
-
+/** Create system tray */
 ipcMain.handle("create-tray", () => {
     tray = new Tray(appIcon);
     tray.setToolTip("Recording...");
@@ -124,6 +122,7 @@ ipcMain.handle("create-tray", () => {
     });
 });
 
+/** Remove system tray */
 ipcMain.handle("remove-tray", () => {
     clearInterval(tray.timer);
     tray.destroy();
