@@ -1,3 +1,4 @@
+/** Shortcut for query selector or create elements */
 export function $(selector) {
     selector = selector.replace('/\n/mg', '').trim()
     if (selector.startsWith('<')) {
@@ -6,6 +7,7 @@ export function $(selector) {
     return document.querySelector(selector)
 }
 
+/** Format date to pattern */
 export function formatDate(date) {
     const month = String(date.getMonth() + 1).padStart(2, 0),
         days = String(date.getDate()).padStart(2, 0),
@@ -15,6 +17,7 @@ export function formatDate(date) {
     return `${date.getFullYear()}-${month}-${days} ${hours}.${mins}.${secs}`
 }
 
+/** Format seconds to pattern */
 export function formatDuration(_seconds) {
     const seconds = _seconds || 0
     const minutes = seconds / 60
@@ -28,6 +31,7 @@ export function formatDuration(_seconds) {
     return `${hoursPadded}:${minutesPadded}:${secondsPadded}.${msPadded}`
 }
 
+/** Parse duration from string */
 export function parseDuration(str) {
     if (!str) return
     const match = str.trim().match(/^(\d{2}):(\d{2}):(\d{2})(\.\d{2,3})$/)
