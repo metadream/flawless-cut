@@ -87,10 +87,25 @@ if (!gotTheLock) { app.quit() } else {
 }
 
 /* --------------------------------------------------------
- * Instance of tray
+ * IPC APIs
  * ----------------------------------------------------- */
 
-ipcMain.on("create-tray", () => {
+ipcMain.handle("open-file-dialog", (multiple = false) => {
+    return dialog.showOpenDialog({
+        properties: ["openFile", multiple ? "multiSelections" : false],
+        filters: [{
+            name: "Media Files", extensions: [
+                "3gp", "asf", "avi", "dat", "flv",
+                "mkv", "mov", "mp4", "mpg", "mpeg", "ogg", "rm", "rmvb", "vob", "wmv",
+                "aac", "ape", "alac", "flac", "mp3", "wav"
+            ]
+        }, {
+            name: "All Files", extensions: ["*"]
+        }]
+    });
+});
+
+ipcMain.handle("create-tray", () => {
     tray = new Tray(appIcon);
     tray.setToolTip("Recording...");
     tray.count = 0;
@@ -109,27 +124,7 @@ ipcMain.on("create-tray", () => {
     });
 });
 
-ipcMain.on("remove-tray", () => {
+ipcMain.handle("remove-tray", () => {
     clearInterval(tray.timer);
     tray.destroy();
-});
-
-/* --------------------------------------------------------
- * IPC Events
- * ----------------------------------------------------- */
-
-ipcMain.handle("open-file-dialog", (multiple = false) => {
-    return dialog.showOpenDialog({
-        properties: ["openFile", multiple ? "multiSelections" : false],
-        filters: [
-            {
-                name: "Media Files", extensions: [
-                    "3gp", "asf", "avi", "dat", "flv",
-                    "mkv", "mov", "mp4", "mpg", "mpeg", "ogg", "rm", "rmvb", "vob", "wmv",
-                    "aac", "ape", "alac", "flac", "mp3", "wav"
-                ]
-            },
-            { name: "All Files", extensions: ["*"] }
-        ]
-    });
 });

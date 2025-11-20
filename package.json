@@ -1,6 +1,6 @@
 {
     "name": "flawless-cut",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Fast, lossless video cutter and merger",
     "author": "Marco Chan",
     "repository": "github:metadream/flawless-cut",
