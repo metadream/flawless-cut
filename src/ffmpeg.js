@@ -104,11 +104,11 @@ export default new class Ffmpeg {
     }
 
     /** Capture image from current frame of video */
-    captureImage(video) {
-        const currentTime = formatDuration(video.currentTime);
-        const outputFile = this.#buildOutputFile(video.source, currentTime, 1, ".jpg");
+    captureImage(videoPath, seconds) {
+        const time = formatDuration(seconds);
+        const outputFile = this.#buildOutputFile(videoPath, time, 1, ".jpg");
         return this.#ffmpegCommand([
-            "-ss", currentTime, "-i", video.source, "-vframes", 1,
+            "-ss", time, "-i", videoPath, "-vframes", 1,
             "-f", "mjpeg", "-q:v", 2, "-y", outputFile
         ]);
     }

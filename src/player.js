@@ -87,7 +87,7 @@ export default new class Player {
 
         // Take a snapshot of current frame from the video
         captureBtn.onclick = function() {
-            ffmpeg.captureImage(video);
+            ffmpeg.captureImage(video.source, video.currentTime);
         }
 
         // Extract audio from the video segment

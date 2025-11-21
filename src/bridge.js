@@ -15,7 +15,7 @@ handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(.
 handleFfmpegIpcMethod("ffmpeg-record-video", (...args) => ffmpeg.recordVideo(...args));
 handleFfmpegIpcMethod("ffmpeg-merge-video", (...args) => ffmpeg.mergeVideos(...args));
 handleFfmpegIpcMethod("ffmpeg-extract-audio", (...args) => ffmpeg.extractAudio(...args));
-handleFfmpegIpcMethod("ffmpeg-capture-video", (...args) => ffmpeg.captureImage(...args));
+handleFfmpegIpcMethod("ffmpeg-capture-image", (...args) => ffmpeg.captureImage(...args));
 handleFfmpegIpcMethod("ffmpeg-exit-process", () => global.process.stdin.write("q"));
 
 /** Open native dialog */
