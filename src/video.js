@@ -76,7 +76,7 @@ export default new class Video {
 
     async transcode() {
         if (!this.hasServer) {
-            await electron.createTranscodeServer();
+            await ffmpeg.createTranscodeServer();
             this.hasServer = true;
         }
         if (!this.transcoded) {
