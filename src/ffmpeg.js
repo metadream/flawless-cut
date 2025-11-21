@@ -82,10 +82,10 @@ export default new class Ffmpeg {
         const outputFile = inputFiles[0] + "-merged" + path.extname(inputFiles[0]);
         const process = this.#ffmpegCommand([
             "-f", "concat", "-safe", "0", "-protocol_whitelist", "file,pipe",
-            "-i", "-", "-c", "copy", "-y", outputFile
+            "-i", "pipe:0", "-c", "copy", "-y", outputFile
         ]);
 
-        const videoList = inputFiles.map(p => "file '" + p + "'").join('\n');
+        const videoList = inputFiles.map(p => "file '" + p + "'").join("\n");
         Readable.from(videoList).pipe(process.stdin);
         return process;
     }

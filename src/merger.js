@@ -12,8 +12,8 @@ export default new class Merger {
                     <div class="title">File List</div><ol></ol>
                 </div>
                 <div class="footer">
-                    <button class="merge">Merge</button>
                     <button class="cancel">Cancel</button>
+                    <button class="merge">Merge</button>
                 </div>
             </div>
         `);
