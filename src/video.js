@@ -1,6 +1,5 @@
 import { $, isNumeric } from "./utils.js";
 import player from "./player.js";
-import ffmpeg from "./ffmpeg.js";
 
 const fileChooser = $("#file-chooser");
 const video = $("video");

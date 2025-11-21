@@ -85,7 +85,7 @@ export default new class Ffmpeg {
             "-i", "-", "-c", "copy", "-y", outputFile
         ]);
 
-        const videoList = videoPaths.map(path => "file '" + path + "'").join('\n');
+        const videoList = videoPaths.map(p => "file '" + p + "'").join('\n');
         Readable.from(videoList).pipe(process.stdin);
         return process;
     }
