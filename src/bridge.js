@@ -1,4 +1,5 @@
 import { app, dialog, ipcMain } from "electron";
+import http from "http";
 import ffmpeg from "./ffmpeg.js";
 
 ipcMain.handle('get-app-name', () => app.getName());
@@ -26,4 +27,20 @@ ipcMain.handle("open-file-dialog", (multiple = false) => {
             name: "All Files", extensions: ["*"]
         }]
     });
+});
+
+/** Create video transcode server */
+ipcMain.handle("create-transcode-server", (port = 4725) => {
+    return http.createServer((request, response) => {
+        const url = new URL(request.url, `http://${request.headers.host}`);
+        const params = Object.fromEntries(url.searchParams);
+        const proc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
+        proc.stdout.pipe(response);
+
+        request.on('close', () => {
+            proc.stdout.destroy();
+            proc.stderr.destroy();
+            proc.kill();
+        });
+    }).listen(port);
 });

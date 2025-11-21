@@ -1,7 +1,5 @@
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from "electron";
-import http from "http";
 import path from "path";
-import ffmpeg from "./src/ffmpeg.js";
 import "./src/bridge.js";
 
 const appIcon = "assets/icons/icon.png";
@@ -75,28 +73,6 @@ function createWindow() {
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null;
-    });
-
-    createServer();
-}
-
-/** Create video transcode server */
-function createServer() {
-    const server = http.createServer((request, response) => {
-        const url = new URL(request.url, `http://${request.headers.host}`);
-        const params = Object.fromEntries(url.searchParams);
-        const ffProc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
-        ffProc.stdout.pipe(response);
-
-        request.on('close', () => {
-            ffProc.stdout.destroy();
-            ffProc.stderr.destroy();
-            ffProc.kill();
-        });
-    }).listen(4725);
-
-    server.on('error', e => {
-        toast(e.message);
     });
 }
 

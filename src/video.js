@@ -1,5 +1,6 @@
 import { $, isNumeric } from "./utils.js";
 import player from "./player.js";
+import ffmpeg from "./ffmpeg.js";
 
 const fileChooser = $('#file-chooser');
 const video = $('video');
@@ -59,6 +60,13 @@ export default new class Video {
             this.transcoded = true;
             this.seek(0);
         }
+
+        // Create transcode server if it doesn't exist
+        if (this.server && this.server.listening) return;
+        this.server = electron.createTranscodeServer();
+        this.server.on('error', e => {
+            toast(e.message);
+        });
     }
 
     seek(timestamp) {
