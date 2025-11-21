@@ -1,7 +1,6 @@
 import { $, addFfmpegListeners, formatDuration, parseDuration } from "./utils.js";
 import video from "./video.js";
 import merger from "./merger.js";
-import audio from "./audio.js";
 import recorder from "./recorder.js";
 
 const timeline = $(".timeline");
@@ -99,13 +98,13 @@ export default new class Player {
 
         // Re-encode video segment to regular MP4 and export
         convertBtn.onclick = () => {
-            const proc = ffmpeg.convertVideo(video.src, this.segmentStartTime, this.segmentEndTime);
+            const proc = ffmpeg.convertVideo(video.source, this.segmentStartTime, this.segmentEndTime);
             addFfmpegListeners(proc);
         }
 
         // Lossless cut video segment and export
         cutBtn.onclick = () => {
-            const proc = ffmpeg.cutVideo(video.src, this.segmentStartTime, this.segmentEndTime);
+            const proc = ffmpeg.cutVideo(video.source, this.segmentStartTime, this.segmentEndTime);
             addFfmpegListeners(proc);
         }
 
@@ -185,7 +184,7 @@ export default new class Player {
     }
 
     /** Display metadata on the panel */
-    displayMetadata() {
+    async displayMetadata() {
         const format = video.getMetadata("General.Format") || "";
         const frameRate = video.getMetadata("General.FrameRate");
         const bitRate = video.getMetadata("General.OverallBitRate");
@@ -195,7 +194,7 @@ export default new class Player {
         if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
         if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
         if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
-        document.title = electron.getAppName() + "  |  " + metadata.join(", ")
+        document.title = (await electron.getAppName()) + "  |  " + metadata.join(", ");
     }
 
     /** Update duration */
@@ -205,24 +204,9 @@ export default new class Player {
 
     /** Set filepath to video source */
     set source(filePath) {
-        video.src = filePath;
-        video.startTime = 0;
-        video.transcoded = false;
-
+        video.source = filePath;
         this.resetControls();
         this.enableControls(false);
-
-        if (video.duration) {
-            this.updateDuration();
-            this.displayMetadata();
-        }
-
-        if (video.getMetadata("Audio") && !video.getMetadata("Video")) {
-            audio.play();
-        } else {
-            audio.pause();
-            audio.hide();
-        }
     }
 
     set status(v) { playBtn.className = v; }

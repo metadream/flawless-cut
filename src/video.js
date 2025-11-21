@@ -1,5 +1,6 @@
 import { $, isNumeric } from "./utils.js";
 import player from "./player.js";
+import audio from "./audio.js";
 
 const fileChooser = $("#file-chooser");
 const video = $("video");
@@ -17,7 +18,23 @@ export default new class Video {
     constructor() {
         video.onloadstart = async () => {
             loading(true);
-            this.metadata = await ffmpeg.getMediaInfo(video.src);
+            this.transcoded = false;
+            this.startTime = 0;
+            this.metadata = await ffmpeg.getMediaInfo(this.source);
+
+            // Update player controls
+            if (this.duration) {
+                player.updateDuration();
+                player.displayMetadata();
+            }
+
+            // Autoplay audio
+            if (this.getMetadata("Audio") && !this.getMetadata("Video")) {
+                audio.play();
+            } else {
+                audio.pause();
+                audio.hide();
+            }
         }
 
         video.onloadedmetadata = () => {
@@ -75,7 +92,7 @@ export default new class Video {
 
         if (this.transcoded) {
             this.startTime = timestamp;
-            video.src = "?source=" + video.originSrc + "&fileSize=" + this.getMetadata("General.FileSize") + "&startTime=" + timestamp;
+            video.src = "?source=" + this.source + "&fileSize=" + this.getMetadata("General.FileSize") + "&startTime=" + timestamp;
         } else {
             video.currentTime = timestamp;
         }
@@ -96,9 +113,9 @@ export default new class Video {
 
     pause() { video.pause(); }
 
-    set src(path) { video.src = video.originSrc = path; }
+    set source(path) { video.src = video.source = path; }
 
-    get src() { return video.src; }
+    get source() { return video.source; }
 
     get paused() { return video.paused; }
 

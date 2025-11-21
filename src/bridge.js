@@ -13,16 +13,16 @@ ipcMain.handle("get-app-path", () => app.getAppPath());
 ipcMain.handle("get-desktop", () => app.getPath("desktop"));
 
 /** Ffmpeg methods bridge */
-ipcMain.handle("ffmpeg-media-info", ffmpeg.getMediaInfo);
-ipcMain.handle("ffmpeg-cut-video", ffmpeg.cutVideo);
-ipcMain.handle("ffmpeg-convert-video", ffmpeg.convertVideo);
-ipcMain.handle("ffmpeg-record-video", ffmpeg.recordVideo);
-ipcMain.handle("ffmpeg-merge-videos", ffmpeg.mergeVideos);
-ipcMain.handle("ffmpeg-extract-audio", ffmpeg.extractAudio);
-ipcMain.handle("ffmpeg-capture-image", ffmpeg.captureImage);
+ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
+ipcMain.handle("ffmpeg-cut-video", (event, path, start, end) => ffmpeg.cutVideo(path, start, end));
+ipcMain.handle("ffmpeg-convert-video", (event, path, start, end) => ffmpeg.convertVideo(path, start, end));
+ipcMain.handle("ffmpeg-record-video", (event, path) => ffmpeg.recordVideo(path));
+ipcMain.handle("ffmpeg-merge-videos", (event, paths) => ffmpeg.mergeVideos(paths));
+ipcMain.handle("ffmpeg-extract-audio", (event, video, start, end) => ffmpeg.extractAudio(video, start, end));
+ipcMain.handle("ffmpeg-capture-image", (event, video) => ffmpeg.captureImage(video));
 
 /** Open native file dialog */
-ipcMain.handle("open-file-dialog", (multiple = false) => {
+ipcMain.handle("open-file-dialog", (event, multiple = false) => {
     return dialog.showOpenDialog({
         properties: ["openFile", multiple ? "multiSelections" : false],
         filters: [{
@@ -38,7 +38,7 @@ ipcMain.handle("open-file-dialog", (multiple = false) => {
 });
 
 /** Create video transcode server */
-ipcMain.handle("create-transcode-server", (port = 4725) => {
+ipcMain.handle("create-transcode-server", (event, port = 4725) => {
     return http.createServer((request, response) => {
         const url = new URL(request.url, `http://${request.headers.host}`);
         const params = Object.fromEntries(url.searchParams);
