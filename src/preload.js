@@ -4,11 +4,12 @@ contextBridge.exposeInMainWorld("electron", {
     getAppName: () => ipcRenderer.invoke("get-app-name"),
     getAppPath: () => ipcRenderer.invoke("get-app-path"),
     getDesktop: () => ipcRenderer.invoke("get-desktop"),
+
     createTray: () => ipcRenderer.invoke("create-tray"),
     removeTray: () => ipcRenderer.invoke("remove-tray"),
-    openFileDialog: multiple => ipcRenderer.invoke("open-file-dialog", multiple),
-    createTranscodeServer: port => ipcRenderer.invoke("create-transcode-server", port),
+
     openExternal: url => ipcRenderer.invoke("open-external", url),
+    openFileDialog: multiple => ipcRenderer.invoke("open-file-dialog", multiple),
     getFilePath: file => webUtils.getPathForFile(file)
 });
 
@@ -20,6 +21,8 @@ contextBridge.exposeInMainWorld("ffmpeg", {
     mergeVideos: (...args) => ipcRenderer.invoke("ffmpeg-merge-videos", ...args),
     extractAudio: (...args) => ipcRenderer.invoke("ffmpeg-extract-audio", ...args),
     captureImage: (...args) => ipcRenderer.invoke("ffmpeg-capture-image", ...args),
-    on: (channel, callback) => ipcRenderer.on(channel, callback),
-    exitProcess: () => ipcRenderer.invoke("ffmpeg-exit-process")
+
+    createTranscodeServer: port => ipcRenderer.invoke("create-transcode-server", port),
+    exitProcess: () => ipcRenderer.invoke("ffmpeg-exit-process"),
+    on: (channel, callback) => ipcRenderer.on(channel, callback)
 });
