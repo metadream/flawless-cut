@@ -33,10 +33,9 @@ ipcMain.handle("open-file-dialog", (event, multiple = false) => {
     });
 });
 
-// TODO 返回值无法通过IPC传递，需调整监听server.on("error")
 /** Create video transcode server */
 ipcMain.handle("create-transcode-server", (event, port = 4725) => {
-    return http.createServer((request, response) => {
+    const server = http.createServer((request, response) => {
         const url = new URL(request.url, `http://${request.headers.host}`);
         const params = Object.fromEntries(url.searchParams);
         const proc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
@@ -48,6 +47,10 @@ ipcMain.handle("create-transcode-server", (event, port = 4725) => {
             proc.kill();
         });
     }).listen(port);
+
+    server.on("error", e => {
+        event.sender.send("transcode-error", e.message);
+    });
 });
 
 /** Handle ffmpeg methods and listen events  */

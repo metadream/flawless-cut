@@ -18,23 +18,6 @@ export default new class Video {
     constructor() {
         video.onloadstart = async () => {
             loading(true);
-            this.transcoded = false;
-            this.startTime = 0;
-            this.metadata = await ffmpeg.getMediaInfo(this.source);
-
-            // Update player controls
-            if (this.duration) {
-                player.updateDuration();
-                player.displayMetadata();
-            }
-
-            // Autoplay audio
-            if (this.getMetadata("Audio") && !this.getMetadata("Video")) {
-                audio.play();
-            } else {
-                audio.pause();
-                audio.hide();
-            }
         }
 
         video.onloadedmetadata = () => {
@@ -71,18 +54,36 @@ export default new class Video {
         }
     }
 
+    async setSource(path) {
+        this.transcoded = false;
+        this.startTime = 0;
+        this.metadata = await ffmpeg.getMediaInfo(path);
+        video.src = video.source = path;
+
+        // Update player controls
+        if (this.duration) {
+            player.updateDuration();
+            player.displayMetadata();
+        }
+
+        // Autoplay audio
+        if (this.getMetadata("Audio") && !this.getMetadata("Video")) {
+            audio.play();
+        } else {
+            audio.pause();
+            audio.hide();
+        }
+    }
+
     async transcode() {
+        if (!this.hasServer) {
+            await electron.createTranscodeServer();
+            this.hasServer = true;
+        }
         if (!this.transcoded) {
             this.transcoded = true;
             this.seek(0);
         }
-
-        // Create transcode server if it doesn't exist
-        if (this.server && this.server.listening) return;
-        this.server = await electron.createTranscodeServer();
-        this.server.on("error", e => {
-            toast(e.message);
-        });
     }
 
     seek(timestamp) {
@@ -92,7 +93,7 @@ export default new class Video {
 
         if (this.transcoded) {
             this.startTime = timestamp;
-            video.src = "?source=" + this.source + "&fileSize=" + this.getMetadata("General.FileSize") + "&startTime=" + timestamp;
+            video.src = "http://127.0.0.1:4725?source=" + this.source + "&fileSize=" + this.getMetadata("General.FileSize") + "&startTime=" + timestamp;
         } else {
             video.currentTime = timestamp;
         }
@@ -112,8 +113,6 @@ export default new class Video {
     play() { video.play(); }
 
     pause() { video.pause(); }
-
-    set source(path) { video.src = video.source = path; }
 
     get source() { return video.source; }
 

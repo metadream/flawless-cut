@@ -142,6 +142,13 @@ export default new class Player {
         }
     }
 
+    /** Set filepath to video source */
+    async setSource(filePath) {
+        this.resetControls();
+        this.enableControls(false);
+        await video.setSource(filePath);
+    }
+
     /** Create segment by start and end time */
     createSegment() {
         segment.style.left = (parseDuration(segmentStartTime.value) / video.duration) * 100 + "%";
@@ -201,13 +208,6 @@ export default new class Player {
     /** Update duration */
     updateDuration() {
         duration.innerHTML = segmentEndTime.value = formatDuration(video.duration);
-    }
-
-    /** Set filepath to video source */
-    set source(filePath) {
-        this.resetControls();
-        this.enableControls(false);
-        video.source = filePath;
     }
 
     set status(v) { playBtn.className = v; }

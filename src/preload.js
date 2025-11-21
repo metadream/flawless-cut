@@ -6,9 +6,9 @@ contextBridge.exposeInMainWorld("electron", {
     getDesktop: () => ipcRenderer.invoke("get-desktop"),
     createTray: () => ipcRenderer.invoke("create-tray"),
     removeTray: () => ipcRenderer.invoke("remove-tray"),
-    openFileDialog: (multiple = false) => ipcRenderer.invoke("open-file-dialog", multiple),
-    createTranscodeServer: (port) => ipcRenderer.invoke("create-transcode-server", port),
-    openExternal: (url) => ipcRenderer.invoke("open-external", url)
+    openFileDialog: multiple => ipcRenderer.invoke("open-file-dialog", multiple),
+    createTranscodeServer: port => ipcRenderer.invoke("create-transcode-server", port),
+    openExternal: url => ipcRenderer.invoke("open-external", url)
 });
 
 contextBridge.exposeInMainWorld("ffmpeg", {

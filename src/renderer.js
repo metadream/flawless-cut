@@ -16,14 +16,14 @@ fileChooser.ondragleave = function(e) {
 }
 fileChooser.ondrop = function(e) {
     e.preventDefault();
-    player.source = e.dataTransfer.files[0].path;
+    player.setSource(e.dataTransfer.files[0].path);
 }
 
 /** Choose to play */
 fileChooser.onclick = async function() {
     const { canceled, filePaths } = await electron.openFileDialog();
     if (!canceled && filePaths && filePaths.length === 1) {
-        player.source = filePaths[0];
+        player.setSource(filePaths[0]);
     }
 }
 
@@ -32,3 +32,4 @@ ffmpeg.on("process-start", () => loading(true));
 ffmpeg.on("process-finish", () => loading(false));
 ffmpeg.on("process-progress", (event, progress) => loading(progress));
 ffmpeg.on("process-error", (event, message) => toast(message));
+ffmpeg.on("transcode-error", (event, message) => toast(message));
