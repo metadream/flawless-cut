@@ -1,14 +1,15 @@
 import { $ } from "./utils.js";
 
-const canvasElement = $('canvas');
+const canvas = $("canvas");
+const audio = $("video");
 
 /**
- * Component: Audio Component
+ * Component: Audio Wave Animation
  * @since 2025-11-20
  */
 export default new class Audio {
     constructor() {
-        this.canvas = canvasElement.getContext('2d');
+        this.ctx = canvas.getContext("2d");
         this.options = {
             accuracy: 256,
             width: 1024,
@@ -16,19 +17,19 @@ export default new class Audio {
             maxHeight: 160,
             minHeight: 1,
             spacing: 1,
-            color: '#ff422d',
-            verticalAlign: 'middle'
+            color: "#ff422d",
+            verticalAlign: "middle"
         };
 
         this.playing = false;
-        this.#init();
+        this.#initContext();
     }
 
     play() {
         if (!this.playing) {
             this.playing = true;
-            canvasElement.style.display = 'block';
             this.#wave();
+            canvas.style.display = "block";
         }
     }
 
@@ -37,12 +38,12 @@ export default new class Audio {
     }
 
     hide() {
-        canvasElement.style.display = 'none';
+        canvas.style.display = "none";
     }
 
-    #init() {
+    #initContext() {
         const audioContext = new AudioContext();
-        const audioSource = audioContext.createMediaElementSource($('video'));
+        const audioSource = audioContext.createMediaElementSource(audio);
 
         this.analyser = audioContext.createAnalyser();
         audioSource.connect(this.analyser);
@@ -51,9 +52,9 @@ export default new class Audio {
         this.freqByteData = new Uint8Array(this.analyser.frequencyBinCount);
 
         const dpr = window.devicePixelRatio || 1;
-        this.canvas.canvas.width = this.options.width * dpr;
-        this.canvas.canvas.height = this.options.height * dpr;
-        this.canvas.scale(dpr, dpr);
+        this.ctx.canvas.width = this.options.width * dpr;
+        this.ctx.canvas.height = this.options.height * dpr;
+        this.ctx.scale(dpr, dpr);
     }
 
     #wave() {
@@ -66,7 +67,7 @@ export default new class Audio {
 
     #visualize(freqByteData) {
         const o = this.options;
-        this.canvas.clearRect(0, 0, o.width, o.height);
+        this.ctx.clearRect(0, 0, o.width, o.height);
 
         const _freqByteData = [].concat(
             Array.from(freqByteData).reverse().splice(o.accuracy / 2, o.accuracy / 2),
@@ -74,7 +75,6 @@ export default new class Audio {
         );
 
         _freqByteData.forEach((value, index) => {
-
             const width = (o.width - o.accuracy * o.spacing) / o.accuracy;
             let left = index * (width + o.spacing);
             o.spacing !== 1 && (left += o.spacing / 2);
@@ -83,10 +83,10 @@ export default new class Audio {
             height = height < o.minHeight ? o.minHeight : height;
 
             switch (o.verticalAlign) {
-                case 'top':
+                case "top":
                     top = 0;
                     break;
-                case 'bottom':
+                case "bottom":
                     top = o.height - height;
                     break;
                 default:
@@ -95,7 +95,7 @@ export default new class Audio {
             }
 
             if (o.color instanceof Array) {
-                const linearGradient = this.canvas.createLinearGradient(left, top, left, top + height);
+                const linearGradient = this.ctx.createLinearGradient(left, top, left, top + height);
                 let pos;
 
                 o.color.forEach((color, index) => {
@@ -110,19 +110,18 @@ export default new class Audio {
                     linearGradient.addColorStop(pos, color);
                 })
 
-                this.canvas.fillStyle = linearGradient;
+                this.ctx.fillStyle = linearGradient;
             } else {
-                this.canvas.fillStyle = o.color;
+                this.ctx.fillStyle = o.color;
             }
 
             if (index <= o.accuracy / 2) {
-                this.canvas.globalAlpha = 1 - (o.accuracy / 2 - 1 - index) / (o.accuracy / 2);
+                this.ctx.globalAlpha = 1 - (o.accuracy / 2 - 1 - index) / (o.accuracy / 2);
             } else {
-                this.canvas.globalAlpha = 1 - (index - o.accuracy / 2) / (o.accuracy / 2);
+                this.ctx.globalAlpha = 1 - (index - o.accuracy / 2) / (o.accuracy / 2);
             }
 
-            this.canvas.fillRect(left, top, width, height);
-        })
+            this.ctx.fillRect(left, top, width, height);
+        });
     }
-
 }

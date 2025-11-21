@@ -2,11 +2,11 @@ import { $, isNumeric } from "./utils.js";
 import player from "./player.js";
 import ffmpeg from "./ffmpeg.js";
 
-const fileChooser = $('#file-chooser');
-const video = $('video');
+const fileChooser = $("#file-chooser");
+const video = $("video");
 
 /**
- * Component: Video Component
+ * Component: Video Instance
  * @since 2025-11-20
  */
 export default new class Video {
@@ -17,8 +17,8 @@ export default new class Video {
 
     constructor() {
         video.onloadstart = async () => {
-            this.metadata = await ffmpeg.getMediaInfo(video.src);
             loading(true);
+            this.metadata = await ffmpeg.getMediaInfo(video.src);
         }
 
         video.onloadedmetadata = () => {
@@ -28,7 +28,7 @@ export default new class Video {
         }
 
         video.oncanplay = () => {
-            if (player.paused) {  // TODO 是否可去掉此判断
+            if (player.paused) {
                 video.play();
             }
         }
@@ -39,7 +39,7 @@ export default new class Video {
 
         video.onended = () => {
             video.pause();
-            player.status = 'play';
+            player.status = "play";
         }
 
         video.onerror = () => {
@@ -47,9 +47,9 @@ export default new class Video {
                 fileChooser.style.opacity = 1;
                 player.enableControls(false);
                 loading(false);
-                toast('Unsupported video format');
+                toast("Unsupported video format");
             } else {
-                toast('This video needs transcoding, playback will be slower');
+                toast("This video needs transcoding, playback will be slower");
                 this.transcode();
             }
         }
@@ -64,7 +64,7 @@ export default new class Video {
         // Create transcode server if it doesn't exist
         if (this.server && this.server.listening) return;
         this.server = electron.createTranscodeServer();
-        this.server.on('error', e => {
+        this.server.on("error", e => {
             toast(e.message);
         });
     }
@@ -76,16 +76,16 @@ export default new class Video {
 
         if (this.transcoded) {
             this.startTime = timestamp;
-            video.src = '?source=' + this.filePath + '&fileSize=' + this.getMetadata('General.FileSize') + '&startTime=' + timestamp;
+            video.src = "?source=" + video.originSrc + "&fileSize=" + this.getMetadata("General.FileSize") + "&startTime=" + timestamp;
         } else {
             video.currentTime = timestamp;
         }
     }
 
-    // TODO cache
+    // Get metadata by property key
     getMetadata(key) {
         let i = 0, value = this.metadata;
-        key = key.split('.');
+        key = key.split(".");
         while (value && i < key.length) {
             value = value[key[i]];
             i++;
@@ -93,12 +93,11 @@ export default new class Video {
         return isNumeric(value) ? Number(value) : value;
     }
 
-    /** Extends original video properties and methods  */
     play() { video.play(); }
 
     pause() { video.pause(); }
 
-    set src(path) { video.src = path; }
+    set src(path) { video.src = video.originSrc = path; }
 
     get src() { return video.src; }
 
@@ -108,6 +107,6 @@ export default new class Video {
 
     get currentTime() { return video.currentTime + this.startTime; }
 
-    get duration() { return this.getMetadata('General.Duration'); }
+    get duration() { return this.getMetadata("General.Duration"); }
 
 }

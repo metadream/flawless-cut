@@ -1,4 +1,4 @@
-import { $, formatDuration, parseDuration } from "./utils.js";
+import { $, addFfmpegListeners, formatDuration, parseDuration } from "./utils.js";
 import video from "./video.js";
 import merger from "./merger.js";
 import audio from "./audio.js";
@@ -28,7 +28,7 @@ const openRecordBtn = $(".open-record");
 const openFilesBtn = $(".open-files");
 
 /**
- * Component: Player Component
+ * Component: Video Player
  * @since 2025-11-20
  */
 export default new class Player {
@@ -87,43 +87,31 @@ export default new class Player {
 
         // Take a snapshot of current frame from the video
         captureBtn.onclick = function() {
-            ffmpeg.captureImage(video);
+            const proc = ffmpeg.captureImage(video);
+            addFfmpegListeners(proc);
         }
 
         // Extract audio from the video segment
         extractBtn.onclick = () => {
-            ffmpeg.extractAudio(video, this.segmentStartTime, this.segmentEndTime);
+            const proc = ffmpeg.extractAudio(video, this.segmentStartTime, this.segmentEndTime);
+            addFfmpegListeners(proc);
         }
 
         // Re-encode video segment to regular MP4 and export
         convertBtn.onclick = () => {
-            ffmpeg.convertVideo(video.src, this.segmentStartTime, this.segmentEndTime);
+            const proc = ffmpeg.convertVideo(video.src, this.segmentStartTime, this.segmentEndTime);
+            addFfmpegListeners(proc);
         }
 
         // Lossless cut video segment and export
         cutBtn.onclick = () => {
-            ffmpeg.cutVideo(video.src, this.segmentStartTime, this.segmentEndTime);
+            const proc = ffmpeg.cutVideo(video.src, this.segmentStartTime, this.segmentEndTime);
+            addFfmpegListeners(proc);
         }
 
-        // TODO Record screen
+        // Record screen
         openRecordBtn.onclick = function() {
             recorder.show();
-            var tray = new nw.Tray({ title: "Tray", icon: "img/icon.png" });
-
-            // Give it a menu
-            var menu = new nw.Menu();
-            menu.append(new nw.MenuItem({
-                // label: "box1", click: function() {
-                //     nw.Window.get().show();
-                // }
-                label: "Click me",
-                click: function() {
-                    console.log("Im clicked");
-                }
-            }));
-            tray.menu = menu;
-
-            nw.Window.get().hide();
         }
 
         // Open video segment files to merge
@@ -163,8 +151,8 @@ export default new class Player {
     /** Reset controls */
     resetControls() {
         this.status = "play";
-        progress.style.left = 0;
-        segment.style.left = 0;
+        progress.style.left = "0";
+        segment.style.left = "0";
         segment.style.right = "100%";
         duration.innerHTML = "00:00:00.000";
         segmentStartTime.value = "00:00:00.000";
@@ -207,7 +195,7 @@ export default new class Player {
         if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
         if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
         if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
-        document.title = electron.getAppName() + '  |  ' + metadata.join(', ')
+        document.title = electron.getAppName() + "  |  " + metadata.join(", ")
     }
 
     /** Update duration */

@@ -1,10 +1,11 @@
-import { $ } from "./utils.js";
+import { $, addFfmpegListeners } from "./utils.js";
 
 /**
- * Component: Recorder Component
+ * Component: Screen Recorder
  * @since 2025-11-20
  */
 export default new class Recorder {
+
     constructor() {
         this.container = $(`
             <div class="recorder"><div>
@@ -14,9 +15,9 @@ export default new class Recorder {
             </div></div>
         `)
 
-        this.duration = this.container.querySelector('.duration')
-        this.startBtn = this.container.querySelector('button.start')
-        this.stopBtn = this.container.querySelector('button.stop')
+        this.duration = this.container.querySelector(".duration")
+        this.startBtn = this.container.querySelector("button.start")
+        this.stopBtn = this.container.querySelector("button.stop")
         document.body.appendChild(this.container)
 
         this.container.onclick = e => this.onMaskClick(e)
@@ -27,39 +28,40 @@ export default new class Recorder {
     async createProcess() {
         this.startBtn.disabled = true
         this.process = await ffmpeg.recordVideo(electron.getDesktop());
+        addFfmpegListeners(this.process);
 
-        this.process.ontimeupdate = res => {
-            this.duration.innerHTML = res
+        this.process.emitter.on("timeupdate", t => {
+            this.duration.innerHTML = t
             if (!this.started) {
                 this.started = true
-                this.startBtn.style.display = 'none'
-                this.stopBtn.style.display = 'block'
+                this.startBtn.style.display = "none"
+                this.stopBtn.style.display = "block"
                 this.container.onclick = null
                 electron.createTray();
             }
-        }
-        this.process.on('exit', () => {
+        });
+        this.process.on("exit", () => {
             this.started = false
             this.startBtn.disabled = false
-            this.startBtn.style.display = 'block'
-            this.stopBtn.style.display = 'none'
+            this.startBtn.style.display = "block"
+            this.stopBtn.style.display = "none"
             this.container.onclick = e => this.onMaskClick(e)
         })
     }
 
     exitProcess() {
-        this.process.stdin.write('q')
+        this.process.stdin.write("q")
         electron.removeTray();
     }
 
     onMaskClick(e) {
         if (e.currentTarget === e.target) {
-            this.container.classList.remove('visible')
+            this.container.classList.remove("visible")
         }
     }
 
     show() {
-        this.container.classList.add('visible')
+        this.container.classList.add("visible")
     }
 
 }

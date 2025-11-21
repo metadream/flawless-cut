@@ -1,5 +1,9 @@
 # Flawless-Cut
 
+1. Electron version upgrade
+2. Code refactoring
+3. Interface optimization
+
 Flawless-Cut was developed to improve the user interface of another
 application, [Lossless-Cut](https://github.com/mifi/lossless-cut), a new plan for UI were mentioned in that project's
 issue but never upgraded. Compared to Lossless-Cut, Flawless-Cut removes some infrequently used features and user

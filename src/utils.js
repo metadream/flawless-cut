@@ -1,7 +1,7 @@
 /** Shortcut for query selector or create elements */
 export function $(selector) {
-    selector = selector.replace('/\n/mg', '').trim()
-    if (selector.startsWith('<')) {
+    selector = selector.replace("/\n/mg", "").trim()
+    if (selector.startsWith("<")) {
         return document.createRange().createContextualFragment(selector).firstChild
     }
     return document.querySelector(selector)
@@ -49,4 +49,13 @@ export function parseDuration(str) {
 
     if (hours > 59 || minutes > 59 || seconds > 59) return
     return (hours * 60 + minutes) * 60 + seconds + ms
+}
+
+/** Add ffmpeg process listeners */
+export function addFfmpegListeners(proc) {
+    proc.emitter.on("start", () => loading(true));
+    proc.emitter.on("finish", () => loading(false));
+    proc.emitter.on("progress", p => loading(p));
+    proc.emitter.on("error", e => toast(e.message));
+    return proc;
 }

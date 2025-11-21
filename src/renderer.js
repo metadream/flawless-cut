@@ -1,9 +1,9 @@
 import { $ } from "./utils.js";
 import player from "./player.js";
 
-const fileChooser = $('#file-chooser');
-const toast = $('.toast');
-const loading = $('.loading');
+const fileChooser = $("#file-chooser");
+const toast = $(".toast");
+const loading = $(".loading");
 
 /** Drag to play */
 fileChooser.ondragover = function() {
@@ -11,11 +11,11 @@ fileChooser.ondragover = function() {
 }
 fileChooser.ondragenter = function(e) {
     e.preventDefault();
-    this.classList.add('ondrag');
+    this.classList.add("ondrag");
 }
 fileChooser.ondragleave = function(e) {
     e.preventDefault();
-    this.classList.remove('ondrag');
+    this.classList.remove("ondrag");
 }
 fileChooser.ondrop = function(e) {
     e.preventDefault();
@@ -25,7 +25,7 @@ fileChooser.ondrop = function(e) {
 /** Choose to play */
 fileChooser.onclick = async function() {
     const { canceled, filePaths } = await electron.openFileDialog();
-    if (!canceled && filePaths && filePaths.length == 1) {
+    if (!canceled && filePaths && filePaths.length === 1) {
         player.source = filePaths[0];
     }
 }
@@ -33,25 +33,25 @@ fileChooser.onclick = async function() {
 /** Web components */
 Object.assign(window, {
     toast(text) {
-        toast.message = toast.querySelector('div');
+        toast.message = toast.querySelector("div");
         toast.message.innerHTML = text;
-        toast.message.classList.add('visible');
+        toast.message.classList.add("visible");
 
         // Auto hide
         if (toast.timer) clearTimeout(toast.timer);
         toast.timer = setTimeout(function() {
-            toast.message.classList.remove('visible');
+            toast.message.classList.remove("visible");
         }, 3000);
     },
 
     loading(progress) {
-        loading.pointer = loading.querySelector('.pointer');
+        loading.pointer = loading.querySelector(".pointer");
         if (progress === false || progress === 100) {
-            loading.style.display = 'none';
-            loading.pointer.innerHTML = '';
+            loading.style.display = "none";
+            loading.pointer.innerHTML = "";
         } else {
-            loading.style.display = 'block';
-            loading.pointer.innerHTML = Number.isInteger(progress) ? progress : '';
+            loading.style.display = "block";
+            loading.pointer.innerHTML = Number.isInteger(progress) ? progress : "";
         }
     }
 });

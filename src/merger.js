@@ -1,7 +1,7 @@
-import { $ } from "./utils.js";
+import { $, addFfmpegListeners } from "./utils.js";
 
 /**
- * Component: Merger Component
+ * Component: Video Merger Panel
  * @since 2025-11-20
  */
 export default new class Merger {
@@ -18,31 +18,27 @@ export default new class Merger {
             </div>
         `);
 
-        this.fileList = this.container.querySelector('ol');
-        const mergeBtn = this.container.querySelector('button.merge');
-        const cancelBtn = this.container.querySelector('button.cancel');
+        this.fileList = this.container.querySelector("ol");
+        const mergeBtn = this.container.querySelector("button.merge");
+        const cancelBtn = this.container.querySelector("button.cancel");
         document.body.appendChild(this.container);
 
         mergeBtn.onclick = () => {
             const proc = ffmpeg.mergeVideos(this.filePaths);
-            proc.emitter.on('start', () => loading(true));
-            proc.emitter.on('finish', () => loading(false));
-            proc.emitter.on('progress', p => loading(p));
-            proc.emitter.on('error', e => toast(e.message));
+            addFfmpegListeners(proc);
         }
-
         cancelBtn.onclick = () => {
-            this.container.style.display = 'none';
+            this.container.style.display = "none";
         }
     }
 
     set sources(filePaths) {
         this.filePaths = filePaths;
-        this.container.style.display = 'flex';
-        this.fileList.innerHTML = '';
+        this.container.style.display = "flex";
+        this.fileList.innerHTML = "";
 
-        filePaths.forEach(filePath => {
-            this.fileList.appendChild($('<li>' + (filePath) + '</li>'));
+        filePaths.forEach(path => {
+            this.fileList.appendChild($("<li>" + path + "</li>"));
         });
     }
 
