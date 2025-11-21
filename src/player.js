@@ -25,6 +25,7 @@ const extractBtn = $(".extract");
 const convertBtn = $(".convert");
 const openRecordBtn = $(".open-record");
 const openFilesBtn = $(".open-files");
+const repoBtn = $(".repo");
 
 /**
  * Component: Video Player
@@ -117,6 +118,11 @@ export default new class Player {
             }
         }
 
+        // Open github link
+        repoBtn.onclick = function() {
+            electron.openExternal("https://github.com/metadream/flawless-cut");
+        }
+
         // Key bindings
         document.onkeyup = function(e) {
             e.preventDefault();
@@ -200,14 +206,14 @@ export default new class Player {
 
     /** Set filepath to video source */
     set source(filePath) {
-        video.source = filePath;
         this.resetControls();
         this.enableControls(false);
+        video.source = filePath;
     }
 
     set status(v) { playBtn.className = v; }
 
-    get paused() { return playBtn.className === "play"; }
+    get paused() { return playBtn.className === "pause"; }
 
     get segmentStartTime() { return segmentStartTime.value; }
 

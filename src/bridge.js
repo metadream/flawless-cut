@@ -1,11 +1,12 @@
-import { app, dialog, ipcMain } from "electron";
+import { app, dialog, ipcMain, shell } from "electron";
 import http from "http";
 import ffmpeg from "./ffmpeg.js";
 
-/** Application paths */
+/** Electron methods */
 ipcMain.handle("get-app-name", () => app.getName());
 ipcMain.handle("get-app-path", () => app.getAppPath());
 ipcMain.handle("get-desktop", () => app.getPath("desktop"));
+ipcMain.handle("open-external", (event, url) => shell.openExternal(url));
 
 /** Ffmpeg methods */
 ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
@@ -32,7 +33,7 @@ ipcMain.handle("open-file-dialog", (event, multiple = false) => {
     });
 });
 
-// TODO 返回值无法通过IPC传递
+// TODO 返回值无法通过IPC传递，需调整监听server.on("error")
 /** Create video transcode server */
 ipcMain.handle("create-transcode-server", (event, port = 4725) => {
     return http.createServer((request, response) => {

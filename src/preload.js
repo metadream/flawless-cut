@@ -7,7 +7,8 @@ contextBridge.exposeInMainWorld("electron", {
     createTray: () => ipcRenderer.invoke("create-tray"),
     removeTray: () => ipcRenderer.invoke("remove-tray"),
     openFileDialog: (multiple = false) => ipcRenderer.invoke("open-file-dialog", multiple),
-    createTranscodeServer: (port) => ipcRenderer.invoke("create-transcode-server", port)
+    createTranscodeServer: (port) => ipcRenderer.invoke("create-transcode-server", port),
+    openExternal: (url) => ipcRenderer.invoke("open-external", url)
 });
 
 contextBridge.exposeInMainWorld("ffmpeg", {
