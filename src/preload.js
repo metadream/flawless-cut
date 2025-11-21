@@ -2,7 +2,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld('electron', {
     getAppName: () => ipcRenderer.invoke('get-app-name'),
-    getAppHome: () => ipcRenderer.invoke('get-app-home'),
+    getAppPath: () => ipcRenderer.invoke('get-app-path'),
     getDesktop: () => ipcRenderer.invoke('get-desktop'),
     createTray: () => ipcRenderer.invoke("create-tray"),
     removeTray: () => ipcRenderer.invoke("remove-tray"),
