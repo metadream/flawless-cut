@@ -71,7 +71,7 @@ export default new class Video {
         }
     }
 
-    transcode() {
+    async transcode() {
         if (!this.transcoded) {
             this.transcoded = true;
             this.seek(0);
@@ -79,7 +79,7 @@ export default new class Video {
 
         // Create transcode server if it doesn't exist
         if (this.server && this.server.listening) return;
-        this.server = electron.createTranscodeServer();
+        this.server = await electron.createTranscodeServer();
         this.server.on("error", e => {
             toast(e.message);
         });
