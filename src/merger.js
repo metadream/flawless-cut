@@ -1,4 +1,4 @@
-import { $, addFfmpegListeners } from "./utils.js";
+import { $ } from "./utils.js";
 
 /**
  * Component: Video Merger Panel
@@ -24,8 +24,7 @@ export default new class Merger {
         document.body.appendChild(this.container);
 
         mergeBtn.onclick = () => {
-            const proc = ffmpeg.mergeVideos(this.filePaths);
-            addFfmpegListeners(proc);
+            ffmpeg.mergeVideos(this.filePaths);
         }
         cancelBtn.onclick = () => {
             this.container.style.display = "none";

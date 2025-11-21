@@ -1,4 +1,4 @@
-import { $, addFfmpegListeners } from "./utils.js";
+import { $ } from "./utils.js";
 
 /**
  * Component: Screen Recorder
@@ -28,8 +28,7 @@ export default new class Recorder {
     async createProcess() {
         this.startBtn.disabled = true
         this.process = await ffmpeg.recordVideo(await electron.getDesktop());
-        addFfmpegListeners(this.process);
-
+        // TODO 监听timeupdate
         this.process.emitter.on("timeupdate", t => {
             this.duration.innerHTML = t
             if (!this.started) {

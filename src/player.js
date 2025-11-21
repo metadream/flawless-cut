@@ -1,4 +1,4 @@
-import { $, addFfmpegListeners, formatDuration, parseDuration } from "./utils.js";
+import { $, formatDuration, parseDuration } from "./utils.js";
 import video from "./video.js";
 import merger from "./merger.js";
 import recorder from "./recorder.js";
@@ -86,26 +86,22 @@ export default new class Player {
 
         // Take a snapshot of current frame from the video
         captureBtn.onclick = function() {
-            const proc = ffmpeg.captureImage(video);
-            addFfmpegListeners(proc);
+            ffmpeg.captureImage(video);
         }
 
         // Extract audio from the video segment
         extractBtn.onclick = () => {
-            const proc = ffmpeg.extractAudio(video, this.segmentStartTime, this.segmentEndTime);
-            addFfmpegListeners(proc);
+            ffmpeg.extractAudio(video, this.segmentStartTime, this.segmentEndTime);
         }
 
         // Re-encode video segment to regular MP4 and export
         convertBtn.onclick = () => {
-            const proc = ffmpeg.convertVideo(video.source, this.segmentStartTime, this.segmentEndTime);
-            addFfmpegListeners(proc);
+            ffmpeg.convertVideo(video.source, this.segmentStartTime, this.segmentEndTime);
         }
 
         // Lossless cut video segment and export
         cutBtn.onclick = () => {
-            const proc = ffmpeg.cutVideo(video.source, this.segmentStartTime, this.segmentEndTime);
-            addFfmpegListeners(proc);
+            ffmpeg.cutVideo(video.source, this.segmentStartTime, this.segmentEndTime);
         }
 
         // Record screen

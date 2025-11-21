@@ -1,10 +1,5 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-/**
- * Exposed APIs for Render Processes
- * @since 2025-11-20
- */
-
 contextBridge.exposeInMainWorld("electron", {
     getAppName: () => ipcRenderer.invoke("get-app-name"),
     getAppPath: () => ipcRenderer.invoke("get-app-path"),
@@ -22,5 +17,6 @@ contextBridge.exposeInMainWorld("ffmpeg", {
     recordVideo: (...args) => ipcRenderer.invoke("ffmpeg-record-video", ...args),
     mergeVideos: (...args) => ipcRenderer.invoke("ffmpeg-merge-videos", ...args),
     extractAudio: (...args) => ipcRenderer.invoke("ffmpeg-extract-audio", ...args),
-    captureImage: (...args) => ipcRenderer.invoke("ffmpeg-capture-image", ...args)
+    captureImage: (...args) => ipcRenderer.invoke("ffmpeg-capture-image", ...args),
+    on: (channel, callback) => ipcRenderer.on(channel, callback)
 });

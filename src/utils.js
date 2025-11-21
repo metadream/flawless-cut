@@ -51,11 +51,29 @@ export function parseDuration(str) {
     return (hours * 60 + minutes) * 60 + seconds + ms
 }
 
-/** Add ffmpeg process listeners */
-export function addFfmpegListeners(proc) {
-    proc.emitter.on("start", () => loading(true));
-    proc.emitter.on("finish", () => loading(false));
-    proc.emitter.on("progress", p => loading(p));
-    proc.emitter.on("error", e => toast(e.message));
-    return proc;
+/** Toast component */
+export function toast(text) {
+    const toast = $(".toast");
+    toast.message = toast.querySelector("div");
+    toast.message.innerHTML = text;
+    toast.message.classList.add("visible");
+
+    // Auto hide
+    if (toast.timer) clearTimeout(toast.timer);
+    toast.timer = setTimeout(function() {
+        toast.message.classList.remove("visible");
+    }, 3000);
+}
+
+/** Loading component */
+export function loading(progress) {
+    const loading = $(".loading");
+    loading.pointer = loading.querySelector(".pointer");
+    if (progress === false || progress === 100) {
+        loading.style.display = "none";
+        loading.pointer.innerHTML = "";
+    } else {
+        loading.style.display = "block";
+        loading.pointer.innerHTML = Number.isInteger(progress) ? progress : "";
+    }
 }

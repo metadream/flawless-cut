@@ -2,26 +2,21 @@ import { app, dialog, ipcMain } from "electron";
 import http from "http";
 import ffmpeg from "./ffmpeg.js";
 
-/**
- * Main Process Bridge
- * @since 2025-11-20
- */
-
-/** Get system paths */
+/** Application paths */
 ipcMain.handle("get-app-name", () => app.getName());
 ipcMain.handle("get-app-path", () => app.getAppPath());
 ipcMain.handle("get-desktop", () => app.getPath("desktop"));
 
-/** Ffmpeg methods bridge */
+/** Ffmpeg methods */
 ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
-ipcMain.handle("ffmpeg-cut-video", (event, path, start, end) => ffmpeg.cutVideo(path, start, end));
-ipcMain.handle("ffmpeg-convert-video", (event, path, start, end) => ffmpeg.convertVideo(path, start, end));
-ipcMain.handle("ffmpeg-record-video", (event, path) => ffmpeg.recordVideo(path));
-ipcMain.handle("ffmpeg-merge-videos", (event, paths) => ffmpeg.mergeVideos(paths));
-ipcMain.handle("ffmpeg-extract-audio", (event, video, start, end) => ffmpeg.extractAudio(video, start, end));
-ipcMain.handle("ffmpeg-capture-image", (event, video) => ffmpeg.captureImage(video));
+handleFfmpegIpcMethod("ffmpeg-cut-video", (...args) => ffmpeg.cutVideo(...args));
+handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(...args));
+handleFfmpegIpcMethod("ffmpeg-record-video", (...args) => ffmpeg.recordVideo(...args));
+handleFfmpegIpcMethod("ffmpeg-merge-video", (...args) => ffmpeg.mergeVideos(...args));
+handleFfmpegIpcMethod("ffmpeg-extract-video", (...args) => ffmpeg.extractAudio(...args));
+handleFfmpegIpcMethod("ffmpeg-capture-video", (...args) => ffmpeg.captureImage(...args));
 
-/** Open native file dialog */
+/** Open native dialog */
 ipcMain.handle("open-file-dialog", (event, multiple = false) => {
     return dialog.showOpenDialog({
         properties: ["openFile", multiple ? "multiSelections" : false],
@@ -37,6 +32,7 @@ ipcMain.handle("open-file-dialog", (event, multiple = false) => {
     });
 });
 
+// TODO 返回值无法通过IPC传递
 /** Create video transcode server */
 ipcMain.handle("create-transcode-server", (event, port = 4725) => {
     return http.createServer((request, response) => {
@@ -52,3 +48,24 @@ ipcMain.handle("create-transcode-server", (event, port = 4725) => {
         });
     }).listen(port);
 });
+
+/** Handle ffmpeg methods and listen events  */
+function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
+    ipcMain.handle(ipcName, (event, ...args) => {
+        const proc = ffmpegMethod(...args);
+
+        proc.emitter.on("start", () => {
+            event.sender.send("process-start");
+        });
+        proc.emitter.on("finish", () => {
+            event.sender.send("process-finish");
+        });
+        proc.emitter.on("progress", p => {
+            event.sender.send("process-progress", p);
+        });
+        proc.emitter.on("error", e => {
+            event.sender.send("process-error", e.message);
+        });
+        return proc.pid;
+    });
+}

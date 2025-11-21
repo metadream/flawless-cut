@@ -1,11 +1,8 @@
-import { $ } from "./utils.js";
+import { $, loading, toast } from "./utils.js";
 import player from "./player.js";
 
-const fileChooser = $("#file-chooser");
-const toast = $(".toast");
-const loading = $(".loading");
-
 /** Drag to play */
+const fileChooser = $("#file-chooser");
 fileChooser.ondragover = function() {
     return false;
 }
@@ -30,28 +27,8 @@ fileChooser.onclick = async function() {
     }
 }
 
-/** Web components */
-Object.assign(window, {
-    toast(text) {
-        toast.message = toast.querySelector("div");
-        toast.message.innerHTML = text;
-        toast.message.classList.add("visible");
-
-        // Auto hide
-        if (toast.timer) clearTimeout(toast.timer);
-        toast.timer = setTimeout(function() {
-            toast.message.classList.remove("visible");
-        }, 3000);
-    },
-
-    loading(progress) {
-        loading.pointer = loading.querySelector(".pointer");
-        if (progress === false || progress === 100) {
-            loading.style.display = "none";
-            loading.pointer.innerHTML = "";
-        } else {
-            loading.style.display = "block";
-            loading.pointer.innerHTML = Number.isInteger(progress) ? progress : "";
-        }
-    }
-});
+/** Listen ffmpeg process events */
+ffmpeg.on('process-start', () => loading(true));
+ffmpeg.on('process-finish', () => loading(false));
+ffmpeg.on('process-progress', (event, progress) => loading(progress));
+ffmpeg.on('process-error', (event, message) => toast(message));
