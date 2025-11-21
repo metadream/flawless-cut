@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("electron", {
     getAppName: () => ipcRenderer.invoke("get-app-name"),
@@ -8,7 +8,8 @@ contextBridge.exposeInMainWorld("electron", {
     removeTray: () => ipcRenderer.invoke("remove-tray"),
     openFileDialog: multiple => ipcRenderer.invoke("open-file-dialog", multiple),
     createTranscodeServer: port => ipcRenderer.invoke("create-transcode-server", port),
-    openExternal: url => ipcRenderer.invoke("open-external", url)
+    openExternal: url => ipcRenderer.invoke("open-external", url),
+    getFilePath: file => webUtils.getPathForFile(file)
 });
 
 contextBridge.exposeInMainWorld("ffmpeg", {

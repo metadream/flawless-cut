@@ -16,7 +16,8 @@ fileChooser.ondragleave = function(e) {
 }
 fileChooser.ondrop = function(e) {
     e.preventDefault();
-    player.setSource(e.dataTransfer.files[0].path);
+    const path = electron.getFilePath(e.dataTransfer.files[0]);
+    player.setSource(path);
 }
 
 /** Choose to play */

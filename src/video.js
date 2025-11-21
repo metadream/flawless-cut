@@ -48,7 +48,6 @@ export default new class Video {
                 loading(false);
                 toast("Unsupported video format");
             } else {
-                toast("This video needs transcoding, playback will be slower");
                 this.transcode();
             }
         }
