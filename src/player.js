@@ -126,8 +126,7 @@ export default new class Player {
         // Key bindings
         document.onkeyup = function(e) {
             e.preventDefault();
-            if (e.target.tagName === "INPUT" || video.duration === undefined)
-                return;
+            if (video.duration === undefined) return;
 
             switch (e.code) {
                 case "Space":
