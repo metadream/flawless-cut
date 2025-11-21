@@ -66,7 +66,7 @@ export default new class Ffmpeg {
 
     /** Record screen to video */
     async recordVideo(outputPath) {
-        const outputFile = outputPath + "\\screen-record-" + formatDate(Date.now()) + ".mp4";
+        const outputFile = outputPath + "\\screen-record-" + formatDate(new Date()) + ".mp4";
         const audioDevice = await this.#getAudioDevice();
         const audioArgs = audioDevice ? ["-f", "dshow", "-i", "audio=" + audioDevice] : [];
 
@@ -161,6 +161,7 @@ export default new class Ffmpeg {
 
     /** Get audio device */
     #getAudioDevice() {
+        // TODO 各平台获取音频设备的参数不同
         return new Promise(resolve => {
             execFile(ffmpeg, ["-list_devices", "true", "-f", "dshow", "-i", "dummy"], (_error, _stdout, stderr) => {
                 const lines = stderr.split("\n");

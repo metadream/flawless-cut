@@ -19,5 +19,6 @@ contextBridge.exposeInMainWorld("ffmpeg", {
     mergeVideos: (...args) => ipcRenderer.invoke("ffmpeg-merge-videos", ...args),
     extractAudio: (...args) => ipcRenderer.invoke("ffmpeg-extract-audio", ...args),
     captureImage: (...args) => ipcRenderer.invoke("ffmpeg-capture-image", ...args),
-    on: (channel, callback) => ipcRenderer.on(channel, callback)
+    on: (channel, callback) => ipcRenderer.on(channel, callback),
+    exitProcess: () => ipcRenderer.invoke("ffmpeg-exit-process")
 });

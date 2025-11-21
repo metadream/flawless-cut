@@ -23,14 +23,9 @@ export default new class Recorder {
         this.container.onclick = e => this.onMaskClick(e)
         this.startBtn.onclick = () => this.createProcess()
         this.stopBtn.onclick = () => this.exitProcess()
-    }
 
-    async createProcess() {
-        this.startBtn.disabled = true
-        this.process = await ffmpeg.recordVideo(await electron.getDesktop());
-        // TODO 监听timeupdate
-        this.process.emitter.on("timeupdate", t => {
-            this.duration.innerHTML = t
+        ffmpeg.on("process-timeupdate", (event, time) => {
+            this.duration.innerHTML = time
             if (!this.started) {
                 this.started = true
                 this.startBtn.style.display = "none"
@@ -39,17 +34,22 @@ export default new class Recorder {
                 electron.createTray();
             }
         });
-        this.process.on("exit", () => {
+        ffmpeg.on("process-exit", () => {
             this.started = false
             this.startBtn.disabled = false
             this.startBtn.style.display = "block"
             this.stopBtn.style.display = "none"
-            this.container.onclick = e => this.onMaskClick(e)
-        })
+            this.container.onclick = e => this.onMaskClick(e);
+        });
+    }
+
+    async createProcess() {
+        this.startBtn.disabled = true
+        await ffmpeg.recordVideo(await electron.getDesktop());
     }
 
     exitProcess() {
-        this.process.stdin.write("q")
+        ffmpeg.exitProcess();
         electron.removeTray();
     }
 

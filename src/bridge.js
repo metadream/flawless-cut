@@ -16,6 +16,7 @@ handleFfmpegIpcMethod("ffmpeg-record-video", (...args) => ffmpeg.recordVideo(...
 handleFfmpegIpcMethod("ffmpeg-merge-video", (...args) => ffmpeg.mergeVideos(...args));
 handleFfmpegIpcMethod("ffmpeg-extract-video", (...args) => ffmpeg.extractAudio(...args));
 handleFfmpegIpcMethod("ffmpeg-capture-video", (...args) => ffmpeg.captureImage(...args));
+handleFfmpegIpcMethod("ffmpeg-exit-process", () => global.process.stdin.write("q"));
 
 /** Open native dialog */
 ipcMain.handle("open-file-dialog", (event, multiple = false) => {
@@ -55,8 +56,8 @@ ipcMain.handle("create-transcode-server", (event, port = 4725) => {
 
 /** Handle ffmpeg methods and listen events  */
 function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
-    ipcMain.handle(ipcName, (event, ...args) => {
-        const proc = ffmpegMethod(...args);
+    ipcMain.handle(ipcName, async (event, ...args) => {
+        const proc = await ffmpegMethod(...args);
 
         proc.emitter.on("start", () => {
             event.sender.send("process-start");
@@ -70,6 +71,16 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
         proc.emitter.on("error", e => {
             event.sender.send("process-error", e.message);
         });
+
+        if (ipcName === "ffmpeg-record-video") {
+            proc.emitter.on("timeupdate", t => {
+                event.sender.send("process-timeupdate", t);
+            });
+            proc.on("exit", () => {
+                event.sender.send("process-exit");
+            });
+            global.process = proc;
+        }
         return proc.pid;
     });
 }
