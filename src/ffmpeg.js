@@ -18,9 +18,9 @@ const ffmpeg = path.join(app.getAppPath(), `bin/${platform}/ffmpeg` + postfix);
 export default new class Ffmpeg {
 
     /** Get metadata from media */
-    getMediaInfo(videoPath) {
+    getMediaInfo(inputFile) {
         return new Promise((resolve, reject) => {
-            execFile(mediainfo, [videoPath, "--Output=JSON"], (error, stdout) => {
+            execFile(mediainfo, [inputFile, "--Output=JSON"], (error, stdout) => {
                 if (error) {
                     reject(new Error("Failed to get media metadata."));
                     return;
@@ -37,8 +37,8 @@ export default new class Ffmpeg {
     }
 
     /** Lossless cut video */
-    cutVideo(videoPath, startTime, endTime) {
-        const outputFile = this.#buildOutputFile(videoPath, startTime, endTime);
+    cutVideo(inputFile, startTime, endTime) {
+        const outputFile = this.#buildOutputFile(inputFile, startTime, endTime);
         const segment = this.#parseSegment(startTime, endTime);
         if (!segment) return;
 
@@ -46,20 +46,20 @@ export default new class Ffmpeg {
         // 使用关键帧截取速度快，但时间不精确；并且如果结尾不是关键帧，则可能出现一段空白（参数 avoid_negative_ts 可解决）
         // 不使用关键帧剪切后视频开头可能存在几秒定格画面；
         return this.#ffmpegCommand([
-            "-ss", segment.start, "-t", segment.duration, "-accurate_seek", "-i", videoPath,
+            "-ss", segment.start, "-t", segment.duration, "-accurate_seek", "-i", inputFile,
             "-vcodec", "copy", "-acodec", "copy", "-avoid_negative_ts", 1, "-y", outputFile
         ]);
     }
 
     /** Re-encode video with regular mode */
-    convertVideo(videoPath, startTime, endTime) {
-        const outputFile = this.#buildOutputFile(videoPath, startTime, endTime, ".mp4");
+    convertVideo(inputFile, startTime, endTime) {
+        const outputFile = this.#buildOutputFile(inputFile, startTime, endTime, ".mp4");
         const segment = this.#parseSegment(startTime, endTime);
         if (!segment) return;
 
         // crf=18 is very close to lossless
         return this.#ffmpegCommand([
-            "-i", videoPath, "-ss", segment.start, "-t", segment.duration,
+            "-i", inputFile, "-ss", segment.start, "-t", segment.duration,
             "-c:v", "libx264", "-preset:v", "veryfast", "-crf", 18, "-y", outputFile
         ]);
     }
@@ -78,46 +78,46 @@ export default new class Ffmpeg {
     }
 
     /** Merge all videos to one */
-    mergeVideos(videoPaths) {
-        const outputFile = videoPaths[0] + "-merged" + path.extname(videoPaths[0]);
+    mergeVideos(inputFiles) {
+        const outputFile = inputFiles[0] + "-merged" + path.extname(inputFiles[0]);
         const process = this.#ffmpegCommand([
             "-f", "concat", "-safe", "0", "-protocol_whitelist", "file,pipe",
             "-i", "-", "-c", "copy", "-y", outputFile
         ]);
 
-        const videoList = videoPaths.map(p => "file '" + p + "'").join('\n');
+        const videoList = inputFiles.map(p => "file '" + p + "'").join('\n');
         Readable.from(videoList).pipe(process.stdin);
         return process;
     }
 
     /** Extract audio from video */
-    extractAudio(videoPath, bitRate, startTime, endTime) {
+    extractAudio(inputFile, bitRate, startTime, endTime) {
         const segment = this.#parseSegment(startTime, endTime);
         if (!segment) return;
 
         const args = bitRate ? (bitRate > 320000 ? ["-b:a", "320k"] : ["-b:a", bitRate]) : ["-q:a", 0];
-        const outputFile = this.#buildOutputFile(videoPath, startTime, endTime, ".mp3");
+        const outputFile = this.#buildOutputFile(inputFile, startTime, endTime, ".mp3");
         return this.#ffmpegCommand([
-            "-ss", segment.start, "-t", segment.duration, "-i", videoPath,
+            "-ss", segment.start, "-t", segment.duration, "-i", inputFile,
             ...args, "-vn", "-y", outputFile
         ]);
     }
 
     /** Capture image from current frame of video */
-    captureImage(videoPath, seconds) {
+    captureImage(inputFile, seconds) {
         const time = formatDuration(seconds);
-        const outputFile = this.#buildOutputFile(videoPath, time, 1, ".jpg");
+        const outputFile = this.#buildOutputFile(inputFile, time, 1, ".jpg");
         return this.#ffmpegCommand([
-            "-ss", time, "-i", videoPath, "-vframes", 1,
+            "-ss", time, "-i", inputFile, "-vframes", 1,
             "-f", "mjpeg", "-q:v", 2, "-y", outputFile
         ]);
     }
 
     /** Fast transcode video and output buffer */
-    fastCodec(videoPath, fileSize, startTime) {
+    fastCodec(inputFile, fileSize, startTime) {
         // -frag_duration: Create fragments that are duration microseconds long.
         return this.#ffmpegCommand([
-            "-ss", startTime, "-i", videoPath, "-preset:v", "ultrafast",
+            "-ss", startTime, "-i", inputFile, "-preset:v", "ultrafast",
             "-f", "mp4", "-frag_duration", 1000000, "pipe:1"
         ], {
             encoding: "buffer", maxBuffer: Number(fileSize)
@@ -188,8 +188,8 @@ export default new class Ffmpeg {
     }
 
     /** Format filename */
-    #buildOutputFile(videoPath, startTime, endTime, extname) {
+    #buildOutputFile(inputFile, startTime, endTime, extname) {
         const suffix = ("-" + startTime + "-" + endTime).replace(/:/g, ".");
-        return videoPath + suffix + (extname || path.extname(videoPath));
+        return inputFile + suffix + (extname || path.extname(inputFile));
     }
 }
