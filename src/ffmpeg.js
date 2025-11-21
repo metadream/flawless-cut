@@ -91,16 +91,14 @@ export default new class Ffmpeg {
     }
 
     /** Extract audio from video */
-    extractAudio(video, startTime, endTime) {
+    extractAudio(videoPath, bitRate, startTime, endTime) {
         const segment = this.#parseSegment(startTime, endTime);
         if (!segment) return;
 
-        const bitrate = video.getMetadata("Audio.BitRate");
-        const args = bitrate ? (bitrate > 320000 ? ["-b:a", "320k"] : ["-b:a", bitrate]) : ["-q:a", 0];
-        const outputFile = this.#buildOutputFile(video.source, startTime, endTime, ".mp3");
-
+        const args = bitRate ? (bitRate > 320000 ? ["-b:a", "320k"] : ["-b:a", bitRate]) : ["-q:a", 0];
+        const outputFile = this.#buildOutputFile(videoPath, startTime, endTime, ".mp3");
         return this.#ffmpegCommand([
-            "-ss", segment.start, "-t", segment.duration, "-i", video.source,
+            "-ss", segment.start, "-t", segment.duration, "-i", videoPath,
             ...args, "-vn", "-y", outputFile
         ]);
     }

@@ -92,7 +92,12 @@ export default new class Player {
 
         // Extract audio from the video segment
         extractBtn.onclick = () => {
-            ffmpeg.extractAudio(video, this.segmentStartTime, this.segmentEndTime);
+            ffmpeg.extractAudio(
+                video.source,
+                video.getMetadata("Audio.BitRate"),
+                this.segmentStartTime,
+                this.segmentEndTime
+            );
         }
 
         // Re-encode video segment to regular MP4 and export
