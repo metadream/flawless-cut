@@ -65,6 +65,9 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
         proc.emitter.on("finish", () => {
             event.sender.send("process-finish");
         });
+        proc.emitter.on("success", () => {
+            event.sender.send("process-success");
+        });
         proc.emitter.on("progress", p => {
             event.sender.send("process-progress", p);
         });

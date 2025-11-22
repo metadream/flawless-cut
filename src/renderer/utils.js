@@ -52,11 +52,14 @@ export function parseDuration(str) {
 }
 
 /** Toast component */
-export function toast(text) {
+export function toast(text, success) {
     const toast = $(".toast");
     toast.message = toast.querySelector("div");
     toast.message.innerHTML = text;
     toast.message.classList.add("visible");
+    if (success) {
+        toast.message.classList.add("success");
+    }
 
     // Auto hide
     if (toast.timer) clearTimeout(toast.timer);

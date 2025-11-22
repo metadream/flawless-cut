@@ -138,6 +138,8 @@ export default new class Ffmpeg {
                 error = error.substring(error.lastIndexOf("\n") + 1);
                 error = error.substring(error.lastIndexOf(":") + 1);
                 emitter.emit("error", new Error(error));
+            } else {
+                emitter.emit("success");
             }
         });
 

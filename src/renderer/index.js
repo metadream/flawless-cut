@@ -31,6 +31,7 @@ fileChooser.onclick = async function() {
 /** Listen ffmpeg process events */
 ffmpeg.on("process-start", () => loading(true));
 ffmpeg.on("process-finish", () => loading(false));
+ffmpeg.on("process-success", () => toast("File output successful", true));
 ffmpeg.on("process-progress", (event, progress) => loading(progress));
 ffmpeg.on("process-error", (event, message) => toast(message));
 ffmpeg.on("transcode-error", (event, message) => toast(message));
