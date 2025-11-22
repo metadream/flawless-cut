@@ -162,8 +162,8 @@ export default new class Ffmpeg {
             }
         });
 
-        process.stderr.on("data", stderr => {
-            const match = / time=(\d{2}:\d{2}:\d{2}\.\d{2,3}) /.exec(stderr);
+        process.stderr.on("data", data => {
+            const match = / time=(\d{2}:\d{2}:\d{2}\.\d{2,3}) /.exec(data);
             if (match) {
                 emitter.emit("timeupdate", match[1]);
 
