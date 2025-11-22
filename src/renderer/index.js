@@ -1,4 +1,4 @@
-import { $, loading, Toast } from "./component.js";
+import { $, Loading, Toast } from "./component.js";
 import player from "./player.js";
 
 /** Drag to play */
@@ -29,9 +29,9 @@ fileChooser.onclick = async function() {
 }
 
 /** Listen ffmpeg process events */
-ffmpeg.on("process-start", () => loading(true));
-ffmpeg.on("process-finish", () => loading(false));
+ffmpeg.on("process-start", () => Loading.show());
+ffmpeg.on("process-finish", () => Loading.hide());
 ffmpeg.on("process-success", () => Toast.success("File output successful"));
-ffmpeg.on("process-progress", (event, progress) => loading(progress));
+ffmpeg.on("process-progress", (event, progress) => Loading.update(progress));
 ffmpeg.on("process-error", (event, message) => Toast.error(message));
 ffmpeg.on("transcode-error", (event, message) => Toast.error(message));

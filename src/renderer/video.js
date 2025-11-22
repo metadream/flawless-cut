@@ -1,5 +1,5 @@
 import { isNumeric } from "../main/utils.js";
-import { $, loading, Toast } from "./component.js";
+import { $, Loading, Toast } from "./component.js";
 import player from "./player.js";
 import audio from "./audio.js";
 
@@ -18,13 +18,13 @@ export default new class Video {
 
     constructor() {
         video.onloadstart = async () => {
-            loading(true);
+            Loading.show();
         }
 
         video.onloadedmetadata = () => {
             fileChooser.style.opacity = 0;
             player.enableControls(true);
-            loading(false);
+            Loading.hide();
         }
 
         video.oncanplay = () => {
@@ -46,7 +46,7 @@ export default new class Video {
             if (this.transcoded) {
                 fileChooser.style.opacity = 1;
                 player.enableControls(false);
-                loading(false);
+                Loading.hide();
                 Toast.error("Unsupported video format");
             } else {
                 this.transcode();
@@ -58,13 +58,20 @@ export default new class Video {
         this.transcoded = false;
         this.startTime = 0;
         this.metadata = await ffmpeg.getMediaInfo(path);
-        video.src = video.source = path;
+
+        if (!this.duration) {
+            video.source = null;
+            video.removeAttribute('src');
+            video.load();
+            fileChooser.style.opacity = 1;
+            Toast.error("Not a media file");
+            return;
+        }
 
         // Update player controls
-        if (this.duration) {
-            player.updateDuration();
-            player.displayMetadata();
-        }
+        video.src = video.source = path;
+        player.updateDuration();
+        player.displayMetadata();
 
         // Autoplay audio
         if (this.getMetadata("Audio") && !this.getMetadata("Video")) {

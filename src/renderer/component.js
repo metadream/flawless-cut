@@ -41,14 +41,25 @@ export const Toast = new class {
 }
 
 /** Loading component */
-export function loading(progress) {
-    const loading = $(".loading");
-    loading.pointer = loading.querySelector(".pointer");
-    if (progress === false || progress === 100) {
-        loading.style.display = "none";
-        loading.pointer.innerHTML = "";
-    } else {
-        loading.style.display = "block";
-        loading.pointer.innerHTML = Number.isInteger(progress) ? progress : "";
+export const Loading = new class {
+    constructor() {
+        this.loading = $(".loading");
+        this.pointer = this.loading.querySelector(".pointer");
+    }
+
+    show() {
+        this.pointer.innerHTML = "";
+        this.loading.style.display = "block";
+    }
+
+    update(progress) {
+        this.pointer.innerHTML = progress;
+        this.loading.style.display = "block";
+        if (progress >= 100) this.hide();
+    }
+
+    hide() {
+        this.pointer.innerHTML = "";
+        this.loading.style.display = "none";
     }
 }
