@@ -36,7 +36,9 @@ ipcMain.handle("open-file-dialog", (event, multiple = false) => {
 
 /** Create video transcode server */
 ipcMain.handle("create-transcode-server", (event, port = 4725) => {
-    const server = http.createServer((request, response) => {
+    if (global.server) return;
+
+    global.server = http.createServer((request, response) => {
         const url = new URL(request.url, `http://${request.headers.host}`);
         const params = Object.fromEntries(url.searchParams);
         const proc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
@@ -49,7 +51,7 @@ ipcMain.handle("create-transcode-server", (event, port = 4725) => {
         });
     }).listen(port);
 
-    server.on("error", e => {
+    global.server.on("error", e => {
         event.sender.send("transcode-error", e.message);
     });
 });

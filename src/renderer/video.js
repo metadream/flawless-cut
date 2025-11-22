@@ -83,13 +83,10 @@ export default new class Video {
     }
 
     async transcode() {
-        if (!this.hasServer) {
-            await ffmpeg.createTranscodeServer();
-            this.hasServer = true;
-        }
         if (!this.transcoded) {
             this.transcoded = true;
             this.seek(0);
+            await ffmpeg.createTranscodeServer();
         }
     }
 
