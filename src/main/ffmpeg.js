@@ -1,9 +1,9 @@
-import path from "path";
+import { formatDate, formatDuration, parseDuration } from "../renderer/utils.js";
+import { app } from "electron";
 import { EventEmitter } from "events";
 import { Readable } from "stream";
 import { execFile } from "child_process";
-import { formatDate, formatDuration, parseDuration } from "./utils.js";
-import { app } from "electron";
+import path from "path";
 
 // Get binary file on different platforms
 const platform = process.platform;

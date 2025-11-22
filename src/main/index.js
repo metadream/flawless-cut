@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from "electron";
 import path from "path";
-import "./src/bridge.js";
+import "./bridge.js";
 
 const appIcon = "assets/icons/icon.png";
 const emptyIcon = nativeImage.createEmpty();
@@ -50,12 +50,12 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(app.getAppPath(), "src/preload.js")
+            preload: path.join(app.getAppPath(), "src/main/preload.js")
         }
     });
 
-    // and load the main.html of the app.
-    mainWindow.loadFile("main.html");
+    // and load the index.html of the app.
+    mainWindow.loadFile("index.html");
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
