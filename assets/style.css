@@ -162,6 +162,7 @@ main canvas {
 .merger li {
     position: relative;
     padding: 10px 0;
+    word-break: break-all;
 }
 
 .merger li::before {
@@ -172,7 +173,6 @@ main canvas {
     right: 0;
     height: 1px;
     background: #51616f;
-    word-break: break-all;
 }
 
 .merger .footer {
