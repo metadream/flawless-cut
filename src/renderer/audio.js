@@ -1,4 +1,4 @@
-import { $ } from "./utils.js";
+import { $ } from "./component.js";
 
 const canvas = $("canvas");
 const audio = $("video");

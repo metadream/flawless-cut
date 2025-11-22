@@ -1,4 +1,4 @@
-import { $ } from "./utils.js";
+import { $ } from "./component.js";
 
 /**
  * Component: Screen Recorder

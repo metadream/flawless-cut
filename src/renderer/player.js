@@ -1,4 +1,5 @@
-import { $, formatDuration, parseDuration } from "./utils.js";
+import { formatDuration, parseDuration } from "../main/utils.js";
+import { $, Toast } from "./component.js";
 import video from "./video.js";
 import merger from "./merger.js";
 import recorder from "./recorder.js";
@@ -118,8 +119,11 @@ export default new class Player {
         // Open video segment files to merge
         openFilesBtn.onclick = async function() {
             const { canceled, filePaths } = await electron.openFileDialog(true);
-            if (!canceled && filePaths && filePaths.length > 1) {
+            if (canceled || !filePaths) return;
+            if (filePaths.length > 1) {
                 merger.sources = filePaths;
+            } else {
+                Toast.warn("You must choose at least two files to merge");
             }
         }
 

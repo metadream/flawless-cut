@@ -1,4 +1,5 @@
-import { $, isNumeric, loading, toast } from "./utils.js";
+import { isNumeric } from "../main/utils.js";
+import { $, loading, Toast } from "./component.js";
 import player from "./player.js";
 import audio from "./audio.js";
 
@@ -46,7 +47,7 @@ export default new class Video {
                 fileChooser.style.opacity = 1;
                 player.enableControls(false);
                 loading(false);
-                toast("Unsupported video format");
+                Toast.error("Unsupported video format");
             } else {
                 this.transcode();
             }

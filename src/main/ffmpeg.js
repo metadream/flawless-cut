@@ -1,4 +1,4 @@
-import { formatDate, formatDuration, parseDuration } from "../renderer/utils.js";
+import { formatDate, formatDuration, parseDuration } from "./utils.js";
 import { app } from "electron";
 import { EventEmitter } from "events";
 import { Readable } from "stream";

@@ -1,12 +1,3 @@
-/** Shortcut for query selector or create elements */
-export function $(selector) {
-    selector = selector.replace("/\n/mg", "").trim()
-    if (selector.startsWith("<")) {
-        return document.createRange().createContextualFragment(selector).firstChild
-    }
-    return document.querySelector(selector)
-}
-
 /** Detect string is a number or not */
 export function isNumeric(string) {
     return Number.isFinite(parseFloat(string))
@@ -49,33 +40,4 @@ export function parseDuration(str) {
 
     if (hours > 59 || minutes > 59 || seconds > 59) return
     return (hours * 60 + minutes) * 60 + seconds + ms
-}
-
-/** Toast component */
-export function toast(text, success) {
-    const toast = $(".toast");
-    toast.message = toast.querySelector("div");
-    toast.message.innerHTML = text;
-    toast.message.classList.add("visible");
-    success ? toast.message.classList.add("success")
-        : toast.message.classList.remove("success");
-
-    // Auto hide
-    if (toast.timer) clearTimeout(toast.timer);
-    toast.timer = setTimeout(function() {
-        toast.message.classList.remove("visible");
-    }, 3000);
-}
-
-/** Loading component */
-export function loading(progress) {
-    const loading = $(".loading");
-    loading.pointer = loading.querySelector(".pointer");
-    if (progress === false || progress === 100) {
-        loading.style.display = "none";
-        loading.pointer.innerHTML = "";
-    } else {
-        loading.style.display = "block";
-        loading.pointer.innerHTML = Number.isInteger(progress) ? progress : "";
-    }
 }

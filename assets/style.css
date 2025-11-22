@@ -306,7 +306,7 @@ main canvas {
     z-index: 999;
     top: -100px;
     color: #fff;
-    background: rgba(238, 77, 55, .8);
+    background: rgba(90, 90, 90, .8);
     padding: 10px 20px;
     border-radius: 3px;
     transition: top .5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
@@ -314,6 +314,14 @@ main canvas {
 
 .toast > div.success {
     background: rgba(0, 207, 102, .8);
+}
+
+.toast > div.warn {
+    background: rgba(255, 165, 0, .8);
+}
+
+.toast > div.error {
+    background: rgba(238, 77, 55, .8);
 }
 
 .toast > div.visible {
