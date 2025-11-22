@@ -144,8 +144,8 @@ main canvas {
 
 .merger .content {
     flex: 1;
-    background: #343d46;
-    color: #fff;
+    background: #4a5560;
+    color: #ccc;
     overflow-y: auto;
     padding: 60px;
 }
@@ -172,7 +172,7 @@ main canvas {
     top: 0;
     right: 0;
     height: 1px;
-    background: #51616f;
+    background: #5d6872;
 }
 
 .merger .footer {
