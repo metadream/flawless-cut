@@ -42,7 +42,7 @@ export default new class Ffmpeg {
         const segment = this.#parseSegment(startTime, endTime);
         if (!segment) return;
 
-        // -i 放在-ss之后表示使用关键帧技术，放在-ss之前表示不使用关键帧技术；
+        // -ss放在-i之前表示使用关键帧技术，放在-i之后表示不使用关键帧技术；
         // 使用关键帧截取速度快，但时间不精确；并且如果结尾不是关键帧，则可能出现一段空白（参数 avoid_negative_ts 可解决）
         // 不使用关键帧剪切后视频开头可能存在几秒定格画面；
         return this.#ffmpegCommand([
@@ -55,11 +55,14 @@ export default new class Ffmpeg {
     convertVideo(inputFile, startTime, endTime) {
         const outputFile = this.#buildOutputFile(inputFile, startTime, endTime, ".mp4");
         const segment = this.#parseSegment(startTime, endTime);
-        if (!segment) return;
+        const firstStart = Math.floor(segment.start);
+        const secondStart = segment.start - firstStart;
 
-        // crf=18 is very close to lossless
+        // 将起始时间拆分成整数部分和小数部分用于设置双-ss参数
+        // 第一个-ss用于快速寻找最接近但小于该时间但关键帧，第二个-ss用于精确裁切
+        // crf=18 参数非常接近无损分割
         return this.#ffmpegCommand([
-            "-i", inputFile, "-ss", segment.start, "-t", segment.duration,
+            "-ss", firstStart, "-i", inputFile, "-ss", secondStart, "-t", segment.duration,
             "-c:v", "libx264", "-preset:v", "veryfast", "-crf", 18, "-y", outputFile
         ]);
     }
