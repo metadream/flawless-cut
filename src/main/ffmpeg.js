@@ -1,8 +1,9 @@
 import { formatDate, formatDuration, parseDuration } from "./utils.js";
 import { app } from "electron";
 import { EventEmitter } from "events";
-import { Readable } from "stream";
 import { execFile } from "child_process";
+import os from "os";
+import fs from "fs";
 import path from "path";
 
 // Get binary file on different platforms
@@ -82,14 +83,29 @@ export default new class Ffmpeg {
 
     /** Merge all videos to one */
     mergeVideos(inputFiles) {
+        // 通过管道写入文件列表的方式报错：Readable.from(fileList).pipe(process.stdin);
+        // 故改为创建临时文件方式作为输入
+        const tmpFile = path.join(os.tmpdir(), "flawless-merge-list.txt");
+        const fileList = inputFiles.map(p => "file '" + p + "'").join("\n");
+        fs.writeFileSync(tmpFile, fileList);
+
         const outputFile = inputFiles[0] + "-merged" + path.extname(inputFiles[0]);
         const process = this.#ffmpegCommand([
-            "-f", "concat", "-safe", "0", "-protocol_whitelist", "file,pipe",
-            "-i", "pipe:0", "-c", "copy", "-y", outputFile
+            "-f", "concat", "-safe", "0",
+            "-i", tmpFile, "-c", "copy", "-y", outputFile
         ]);
 
-        const videoList = inputFiles.map(p => "file '" + p + "'").join("\n");
-        Readable.from(videoList).pipe(process.stdin);
+        // 删除临时文件
+        process.on("error", () => {
+            if (fs.existsSync(tmpFile)) {
+                fs.unlinkSync(tmpFile);
+            }
+        });
+        process.on("close", (err) => {
+            if (fs.existsSync(tmpFile)) {
+                fs.unlinkSync(tmpFile);
+            }
+        });
         return process;
     }
 

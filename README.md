@@ -4,6 +4,15 @@
 2. Code refactoring
 3. Interface optimization
 
+ffmpeg static build v8.0.1 待确认
+https://www.ffmpeg.org/download.html
+Windows: https://github.com/BtbN/FFmpeg-Builds/releases
+Linux: https://github.com/BtbN/FFmpeg-Builds/releases
+MacOS: https://evermeet.cx/ffmpeg
+
+mediainfo static v25.10 待确认
+https://mediaarea.net/en/MediaInfo
+
 Flawless-Cut was developed to improve the user interface of another
 application, [Lossless-Cut](https://github.com/mifi/lossless-cut), a new plan for UI were mentioned in that project's
 issue but never upgraded. Compared to Lossless-Cut, Flawless-Cut removes some infrequently used features and user

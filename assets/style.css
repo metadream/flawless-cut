@@ -144,27 +144,35 @@ main canvas {
 
 .merger .content {
     flex: 1;
-    background: #fff;
+    background: #343d46;
+    color: #fff;
     overflow-y: auto;
     padding: 60px;
+}
+
+.merger .title {
+    font-size: 30px;
+    text-align: right;
 }
 
 .merger ol {
     padding: 0;
 }
 
-.merger .title {
-    font-size: 30px;
-}
-
 .merger li {
-    border-top: #eee 1px solid;
-    padding: 10px 20px;
-    list-style-position: inside;
+    position: relative;
+    padding: 10px 0;
 }
 
-.merger li:last-child {
-    border-bottom: #eee 1px solid;
+.merger li::before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 0;
+    right: 0;
+    height: 1px;
+    background: #51616f;
+    word-break: break-all;
 }
 
 .merger .footer {
