@@ -17,8 +17,8 @@ contextBridge.exposeInMainWorld("ffmpeg", {
     getMediaInfo: (...args) => ipcRenderer.invoke("ffmpeg-media-info", ...args),
     cutVideo: (...args) => ipcRenderer.invoke("ffmpeg-cut-video", ...args),
     convertVideo: (...args) => ipcRenderer.invoke("ffmpeg-convert-video", ...args),
-    recordVideo: (...args) => ipcRenderer.invoke("ffmpeg-record-video", ...args),
     mergeVideos: (...args) => ipcRenderer.invoke("ffmpeg-merge-videos", ...args),
+    recordScreen: (...args) => ipcRenderer.invoke("ffmpeg-record-screen", ...args),
     extractAudio: (...args) => ipcRenderer.invoke("ffmpeg-extract-audio", ...args),
     captureImage: (...args) => ipcRenderer.invoke("ffmpeg-capture-image", ...args),
 

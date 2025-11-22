@@ -69,16 +69,37 @@ export default new class Ffmpeg {
     }
 
     /** Record screen to video */
-    async recordVideo(outputPath) {
-        const outputFile = outputPath + "\\screen-record-" + formatDate(new Date()) + ".mp4";
-        const audioDevice = await this.#getAudioDevice();
-        const audioArgs = audioDevice ? ["-f", "dshow", "-i", "audio=" + audioDevice] : [];
+    async recordScreen(outputPath) {
+        const outputFile = path.join(outputPath, "screen-record-" + formatDate(new Date()) + ".mp4");
+        let args = null;
 
-        return this.#ffmpegCommand([
-            "-f", "gdigrab", "-i", "desktop", ...audioArgs,
-            "-c:v", "libx264", "-c:a", "aac", "-q:a", 0,
-            "-y", outputFile
-        ]);
+        switch (platform) {
+            // Windows需要获取录音设备名称
+            case "win32":
+                const audioDevice = await this.#getAudioDevice();
+                const audioArgs = audioDevice ? ["-f", "dshow", "-i", "audio=" + audioDevice] : [];
+                args = ["-f", "gdigrab", "-i", "desktop", ...audioArgs];
+                break;
+            // Linux默认帧率和分辨率可能比较低
+            // :0.0表示获取第一个显示器的第一个屏幕，default选择系统默认输入设备
+            case "linux":
+                args = [
+                    "-f", "x11grab", "-framerate", 30,
+                    "-video_size", "1920x1080", "-i", ":0.0",
+                    "-f", "pulse", "-i", "default"
+                ];
+                break;
+            // MacOS 1:0表示视频设备1（通常是主屏幕），音频设备0（通常是默认麦克风）。
+            case "darwin":
+                args = ["-f", "avfoundation", "-i", "1:0"];
+                break;
+            default:
+                throw new Error(`Unsupported platform ${platform}`);
+        }
+
+        return this.#ffmpegCommand(args.concat([
+            "-c:v", "libx264", "-c:a", "aac", "-q:a", 0, "-y", outputFile
+        ]));
     }
 
     /** Merge all videos to one */

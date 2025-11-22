@@ -45,7 +45,7 @@ export default new class Recorder {
 
     async createProcess() {
         this.startBtn.disabled = true
-        await ffmpeg.recordVideo(await electron.getDesktop());
+        await ffmpeg.recordScreen(await electron.getDesktop());
     }
 
     exitProcess() {
