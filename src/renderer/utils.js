@@ -57,9 +57,8 @@ export function toast(text, success) {
     toast.message = toast.querySelector("div");
     toast.message.innerHTML = text;
     toast.message.classList.add("visible");
-    if (success) {
-        toast.message.classList.add("success");
-    }
+    success ? toast.message.classList.add("success")
+        : toast.message.classList.remove("success");
 
     // Auto hide
     if (toast.timer) clearTimeout(toast.timer);

@@ -57,33 +57,37 @@ ipcMain.handle("create-transcode-server", (event, port = 4725) => {
 /** Handle ffmpeg methods and listen events  */
 function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
     ipcMain.handle(ipcName, async (event, ...args) => {
-        const proc = await ffmpegMethod(...args);
+        try {
+            const proc = await ffmpegMethod(...args);
 
-        proc.emitter.on("start", () => {
-            event.sender.send("process-start");
-        });
-        proc.emitter.on("finish", () => {
-            event.sender.send("process-finish");
-        });
-        proc.emitter.on("success", () => {
-            event.sender.send("process-success");
-        });
-        proc.emitter.on("progress", p => {
-            event.sender.send("process-progress", p);
-        });
-        proc.emitter.on("error", e => {
+            proc.emitter.on("start", () => {
+                event.sender.send("process-start");
+            });
+            proc.emitter.on("finish", () => {
+                event.sender.send("process-finish");
+            });
+            proc.emitter.on("success", () => {
+                event.sender.send("process-success");
+            });
+            proc.emitter.on("progress", p => {
+                event.sender.send("process-progress", p);
+            });
+            proc.emitter.on("error", e => {
+                event.sender.send("process-error", e.message);
+            });
+
+            if (ipcName === "ffmpeg-record-video") {
+                proc.emitter.on("timeupdate", t => {
+                    event.sender.send("process-timeupdate", t);
+                });
+                proc.on("exit", () => {
+                    event.sender.send("process-exit");
+                });
+                global.process = proc;
+            }
+            return proc.pid;
+        } catch (e) {
             event.sender.send("process-error", e.message);
-        });
-
-        if (ipcName === "ffmpeg-record-video") {
-            proc.emitter.on("timeupdate", t => {
-                event.sender.send("process-timeupdate", t);
-            });
-            proc.on("exit", () => {
-                event.sender.send("process-exit");
-            });
-            global.process = proc;
         }
-        return proc.pid;
     });
 }
