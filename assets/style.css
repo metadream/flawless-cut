@@ -9,12 +9,24 @@
     src: url(saira.ttf) format("truetype");
 }
 
+:root {
+    --font-color: #333;
+    --gray-color: #999;
+    --bg-color: #eee;
+    --contrast-color: 220, 51, 102; /* #d36;*/
+    --panel-color: #343d46;
+    --ondrag-color: #38424b;
+    --timeline-color: #4a5560;
+    --text-size: 14px;
+    --title-size: 30px;
+}
+
 body {
     margin: 0;
-    color: #333;
-    background: #eee;
+    color: var(--font-color);
+    background: var(--bg-color);
+    font-size: var(--text-size);
     font-family: "Saira";
-    font-size: 14px;
 }
 
 /* --------------------------------------------------------
@@ -24,10 +36,10 @@ body {
 main {
     position: fixed;
     bottom: 130px;
-    top: 0;
     left: 0;
     right: 0;
-    background: #343d46;
+    top: 0;
+    background: var(--panel-color);
     display: flex;
     justify-content: center;
 }
@@ -53,8 +65,8 @@ main canvas {
     left: 60px;
     right: 60px;
     font-size: 30px;
-    color: #4a5560;
-    border: #4a5560 3px dashed;
+    color: var(--timeline-color);
+    border: var(--timeline-color) 3px dashed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,7 +75,7 @@ main canvas {
 }
 
 #file-chooser.ondrag {
-    background: rgba(74, 85, 96, 0.2);
+    background: var(--ondrag-color);
 }
 
 /* --------------------------------------------------------
@@ -84,8 +96,8 @@ main canvas {
     position: relative;
     height: 40px;
     line-height: 40px;
-    color: #999;
-    background: #4a5560;
+    color: var(--gray-color);
+    background: var(--timeline-color);
     cursor: default;
     user-select: none;
 }
@@ -94,7 +106,7 @@ main canvas {
     position: absolute;
     top: 0;
     bottom: 0;
-    background: rgba(221, 51, 102, .6);
+    background: rgba(var(--contrast-color), .6);
 }
 
 .timeline #progress {
@@ -102,7 +114,7 @@ main canvas {
     top: 0;
     bottom: 0;
     left: 0;
-    background: #ccc;
+    background: var(--gray-color);
     width: 1px;
 }
 
