@@ -5,12 +5,12 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 
+const { env, platform, resourcesPath } = process;
 const mediainfo = getExecutablePath("mediainfo");
 const ffmpeg = getExecutablePath("ffmpeg");
 
 /** Get executable binary path by different env and platforms */
 function getExecutablePath(name) {
-    const { env, platform, resourcesPath } = process;
     const postfix = platform === "win32" ? ".exe" : "";
     return env.NODE_ENV === "development"
         ? path.join(process.cwd(), "bin", platform, name + postfix)
