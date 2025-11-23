@@ -10,13 +10,17 @@
     "type": "module",
     "main": "src/main/index.js",
     "scripts": {
-        "start": "electron .",
+        "start": "NODE_ENV=development electron .",
         "build:linux": "electron-builder -l",
         "build:win": "electron-builder -w",
         "build:mac": "electron-builder -m"
     },
     "build": {
         "appId": "flawless-cut",
+        "files": [
+            "**/*",
+            "!bin/**/*"
+        ],
         "win": {
             "target": [ "nsis" ]
         },
@@ -26,6 +30,12 @@
         "mac": {
             "target": [ "dmg" ],
             "icon": "assets/icons/icon.icns",
+            "extraResources": [
+                {
+                    "from": "bin/darwin",
+                    "to": "bin"
+                }
+            ],
             "category": "public.app-category.productivity",
             "extendInfo": {
                 "CFBundleDisplayName": "Flawless Cut"
