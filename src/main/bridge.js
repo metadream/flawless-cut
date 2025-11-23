@@ -78,7 +78,7 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
                 event.sender.send("process-error", e.message);
             });
 
-            if (ipcName === "ffmpeg-record-video") {
+            if (ipcName === "ffmpeg-record-screen") {
                 proc.emitter.on("timeupdate", t => {
                     event.sender.send("process-timeupdate", t);
                 });
