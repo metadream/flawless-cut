@@ -1,20 +1,21 @@
-import { formatDate, formatDuration, parseDuration } from "./utils.js";
-import { execFile } from "child_process";
-import { EventEmitter } from "events";
 import os from "os";
 import fs from "fs";
 import path from "path";
+import { app } from "electron";
+import { EventEmitter } from "events";
+import { execFile } from "child_process";
+import { formatDate, formatDuration, parseDuration } from "./utils.js";
 
-const { env, platform, resourcesPath } = process;
+const { platform } = process;
 const mediainfo = getExecutablePath("mediainfo");
 const ffmpeg = getExecutablePath("ffmpeg");
 
 /** Get executable binary path by different env and platforms */
 function getExecutablePath(name) {
     const postfix = platform === "win32" ? ".exe" : "";
-    return env.NODE_ENV === "development"
-        ? path.join(process.cwd(), "bin", platform, name + postfix)
-        : path.join(resourcesPath, "bin", name + postfix);
+    return app.isPackaged
+        ? path.join(process.resourcesPath, "bin", name + postfix)
+        : path.join(process.cwd(), "bin", platform, name + postfix);
 }
 
 /**
