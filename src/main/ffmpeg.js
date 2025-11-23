@@ -205,9 +205,8 @@ export default new class Ffmpeg {
         return Object.assign(process, { emitter });
     }
 
-    /** Get audio device */
+    /** Get audio device on Windows */
     #getAudioDevice() {
-        // TODO 各平台获取音频设备的参数不同
         return new Promise(resolve => {
             execFile(ffmpeg, ["-list_devices", "true", "-f", "dshow", "-i", "dummy"], (_error, _stdout, stderr) => {
                 const lines = stderr.split("\n");
