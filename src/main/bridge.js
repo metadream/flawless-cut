@@ -1,5 +1,6 @@
 import { app, dialog, ipcMain, shell } from "electron";
 import http from "http";
+import subprocess from "./subprocess.js";
 import ffmpeg from "./ffmpeg.js";
 
 /** Electron methods */
@@ -87,6 +88,8 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
                 });
                 global.recordingProcess = proc;
             }
+
+            subprocess.register(proc);
             return proc.pid;
         } catch (e) {
             event.sender.send("process-error", e.message);
