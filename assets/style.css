@@ -94,7 +94,7 @@ main canvas {
     position: absolute;
     top: 0;
     bottom: 0;
-    background: rgba(200, 2, 100, 0.5);
+    background: rgba(221, 51, 102, .6);
 }
 
 .timeline #progress {
@@ -249,7 +249,7 @@ main canvas {
 
 .recorder button.stop {
     display: none;
-    background: rgb(200, 2, 100);
+    background: #d36;
 }
 
 /* --------------------------------------------------------
