@@ -4,6 +4,8 @@
 2. Code refactoring
 3. Interface optimization
 
+sips -s format icns icon.png --out icon.icns
+
 ffmpeg static build v8.0.1 待确认
 https://www.ffmpeg.org/download.html
 Windows: https://github.com/BtbN/FFmpeg-Builds/releases
