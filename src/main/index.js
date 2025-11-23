@@ -3,9 +3,10 @@ import path from "path";
 import "./bridge.js";
 
 const appPath = app.getAppPath();
-const preload = path.join(appPath, "src/main/preload.js");
 const appIcon = path.join(appPath, "assets/icons/icon.png");
-const emptyIcon = nativeImage.createEmpty();
+const trayIcon = path.join(appPath, "assets/icons/tray.png");
+const recordingIcon = path.join(appPath, "assets/icons/recording.png");
+const preload = path.join(appPath, "src/main/preload.js");
 let mainWindow, tray;
 
 /** Singleton application instance */
@@ -80,22 +81,21 @@ function createWindow() {
 
 /** Create system tray */
 ipcMain.handle("create-tray", () => {
-    tray = new Tray(appIcon);
-    tray.setToolTip("Recording...");
-    tray.count = 0;
+    if (tray) return;
+
+    const blackIcon = nativeImage.createFromPath(trayIcon).resize({ width: 24, height: 24 });
+    const blinkIcon = nativeImage.createFromPath(recordingIcon).resize({ width: 24, height: 24 });
+    blackIcon.setTemplateImage(true);
+
+    let count = 0;
+    tray = new Tray(blackIcon);
+    tray.setToolTip("Screen Recording...");
     tray.timer = setInterval(() => {
-        tray.count++;
-        if (tray.count % 2 === 0) {
-            tray.setImage(appIcon);
-        } else {
-            tray.setImage(emptyIcon);
-        }
+        tray.setImage(count++ % 2 === 0 ? blackIcon : blinkIcon);
     }, 500);
 
     mainWindow.hide();
-    tray.on("click", () => {
-        mainWindow.show();
-    });
+    tray.on("click", () => mainWindow.show());
 });
 
 /** Remove system tray */

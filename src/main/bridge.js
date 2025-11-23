@@ -13,10 +13,10 @@ ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
 handleFfmpegIpcMethod("ffmpeg-cut-video", (...args) => ffmpeg.cutVideo(...args));
 handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(...args));
 handleFfmpegIpcMethod("ffmpeg-merge-videos", (...args) => ffmpeg.mergeVideos(...args));
-handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => ffmpeg.recordScreen(...args));
 handleFfmpegIpcMethod("ffmpeg-extract-audio", (...args) => ffmpeg.extractAudio(...args));
 handleFfmpegIpcMethod("ffmpeg-capture-image", (...args) => ffmpeg.captureImage(...args));
-handleFfmpegIpcMethod("ffmpeg-exit-process", () => global.process.stdin.write("q"));
+handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => ffmpeg.recordScreen(...args));
+handleFfmpegIpcMethod("ffmpeg-exit-recording", () => global.recordingProcess.stdin.write("q"));
 
 /** Open native dialog */
 ipcMain.handle("open-file-dialog", (event, multiple = false) => {
@@ -80,12 +80,12 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
 
             if (ipcName === "ffmpeg-record-screen") {
                 proc.emitter.on("timeupdate", t => {
-                    event.sender.send("process-timeupdate", t);
+                    event.sender.send("recording-update", t);
                 });
                 proc.on("exit", () => {
-                    event.sender.send("process-exit");
+                    event.sender.send("recording-exit");
                 });
-                global.process = proc;
+                global.recordingProcess = proc;
             }
             return proc.pid;
         } catch (e) {

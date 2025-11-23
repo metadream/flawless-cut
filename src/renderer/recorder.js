@@ -21,10 +21,10 @@ export default new class Recorder {
         document.body.appendChild(this.container);
 
         this.container.onclick = e => this.onMaskClick(e);
-        this.startBtn.onclick = () => this.createProcess();
-        this.stopBtn.onclick = () => this.exitProcess();
+        this.startBtn.onclick = () => this.startRecording();
+        this.stopBtn.onclick = () => this.exitRecording();
 
-        ffmpeg.on("process-timeupdate", (event, time) => {
+        ffmpeg.on("recording-update", (event, time) => {
             this.duration.innerHTML = time;
             if (!this.started) {
                 this.started = true;
@@ -34,7 +34,7 @@ export default new class Recorder {
                 electron.createTray();
             }
         });
-        ffmpeg.on("process-exit", () => {
+        ffmpeg.on("recording-exit", () => {
             this.started = false;
             this.startBtn.disabled = false;
             this.startBtn.style.display = "block";
@@ -43,13 +43,13 @@ export default new class Recorder {
         });
     }
 
-    async createProcess() {
+    async startRecording() {
         this.startBtn.disabled = true;
         await ffmpeg.recordScreen(await electron.getDesktop());
     }
 
-    exitProcess() {
-        ffmpeg.exitProcess();
+    exitRecording() {
+        ffmpeg.exitRecording();
         electron.removeTray();
     }
 

@@ -18,11 +18,11 @@ contextBridge.exposeInMainWorld("ffmpeg", {
     cutVideo: (...args) => ipcRenderer.invoke("ffmpeg-cut-video", ...args),
     convertVideo: (...args) => ipcRenderer.invoke("ffmpeg-convert-video", ...args),
     mergeVideos: (...args) => ipcRenderer.invoke("ffmpeg-merge-videos", ...args),
-    recordScreen: (...args) => ipcRenderer.invoke("ffmpeg-record-screen", ...args),
     extractAudio: (...args) => ipcRenderer.invoke("ffmpeg-extract-audio", ...args),
     captureImage: (...args) => ipcRenderer.invoke("ffmpeg-capture-image", ...args),
+    recordScreen: (...args) => ipcRenderer.invoke("ffmpeg-record-screen", ...args),
+    exitRecording: () => ipcRenderer.invoke("ffmpeg-exit-recording"),
 
     createTranscodeServer: port => ipcRenderer.invoke("create-transcode-server", port),
-    exitProcess: () => ipcRenderer.invoke("ffmpeg-exit-process"),
     on: (channel, callback) => ipcRenderer.on(channel, callback)
 });
