@@ -81,8 +81,6 @@ function createWindow() {
 
 /** Create system tray */
 ipcMain.handle("create-tray", () => {
-    if (tray) return;
-
     const blackIcon = nativeImage.createFromPath(trayIcon).resize({ width: 24, height: 24 });
     const blinkIcon = nativeImage.createFromPath(recordingIcon).resize({ width: 24, height: 24 });
     blackIcon.setTemplateImage(true);
@@ -94,7 +92,7 @@ ipcMain.handle("create-tray", () => {
         tray.setImage(count++ % 2 === 0 ? blackIcon : blinkIcon);
     }, 500);
 
-    mainWindow.hide();
+    mainWindow.minimize();
     tray.on("click", () => mainWindow.show());
 });
 

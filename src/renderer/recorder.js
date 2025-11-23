@@ -30,7 +30,7 @@ export default new class Recorder {
                 this.started = true;
                 this.startBtn.style.display = "none";
                 this.stopBtn.style.display = "block";
-                this.container.onclick = null;
+                this.stopBtn.disabled = false;
                 electron.createTray();
             }
         });
@@ -39,28 +39,34 @@ export default new class Recorder {
             this.startBtn.disabled = false;
             this.startBtn.style.display = "block";
             this.stopBtn.style.display = "none";
+            this.duration.innerHTML = "00:00:00.00";
             this.container.onclick = e => this.onMaskClick(e);
+            this.hide();
+            electron.removeTray();
         });
     }
 
     async startRecording() {
         this.startBtn.disabled = true;
+        this.container.onclick = null;
         await ffmpeg.recordScreen(await electron.getDesktop());
     }
 
     exitRecording() {
+        this.stopBtn.disabled = true;
         ffmpeg.exitRecording();
-        electron.removeTray();
     }
 
     onMaskClick(e) {
-        if (e.currentTarget === e.target) {
-            this.container.classList.remove("visible");
-        }
+        if (e.currentTarget === e.target) this.hide();
     }
 
     show() {
         this.container.classList.add("visible");
+    }
+
+    hide() {
+        this.container.classList.remove("visible");
     }
 
 }
