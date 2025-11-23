@@ -22,7 +22,7 @@ export default new class Recorder {
 
         this.container.onclick = e => this.onMaskClick(e);
         this.startBtn.onclick = () => this.startRecording();
-        this.stopBtn.onclick = () => this.exitRecording();
+        this.stopBtn.onclick = () => this.stopRecording();
 
         ffmpeg.on("recording-update", (event, time) => {
             this.duration.innerHTML = time;
@@ -52,7 +52,7 @@ export default new class Recorder {
         await ffmpeg.recordScreen(await electron.getDesktop());
     }
 
-    exitRecording() {
+    stopRecording() {
         this.stopBtn.disabled = true;
         ffmpeg.exitRecording();
     }
