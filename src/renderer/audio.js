@@ -4,7 +4,7 @@ const canvas = $("canvas");
 const audio = $("video");
 
 /**
- * Component: Audio Wave Animation
+ * 音频声波组件
  * @since 2025-11-20
  */
 export default new class Audio {
@@ -28,7 +28,7 @@ export default new class Audio {
     play() {
         if (!this.playing) {
             this.playing = true;
-            this.#wave();
+            this.#animate();
             canvas.style.display = "block";
         }
     }
@@ -57,11 +57,11 @@ export default new class Audio {
         this.ctx.scale(dpr, dpr);
     }
 
-    #wave() {
+    #animate() {
         if (this.playing) {
             this.analyser.getByteFrequencyData(this.freqByteData);
             this.#visualize(this.freqByteData);
-            requestAnimationFrame(() => this.#wave());
+            requestAnimationFrame(() => this.#animate());
         }
     }
 

@@ -1,7 +1,7 @@
 import { $ } from "./component.js";
 
 /**
- * Component: Screen Recorder
+ * 录屏和录音组件
  * @since 2025-11-20
  */
 export default new class Recorder {
@@ -24,6 +24,7 @@ export default new class Recorder {
         this.startBtn.onclick = () => this.startRecording();
         this.stopBtn.onclick = () => this.stopRecording();
 
+        // 监听录制过程事件
         ffmpeg.on("recording-update", (event, time) => {
             this.duration.innerHTML = time;
             if (!this.started) {
@@ -34,6 +35,8 @@ export default new class Recorder {
                 electron.createTray();
             }
         });
+
+        // 监听录制退出事件
         ffmpeg.on("recording-exit", () => {
             this.started = false;
             this.startBtn.disabled = false;

@@ -7,7 +7,7 @@ const fileChooser = $("#file-chooser");
 const video = $("video");
 
 /**
- * Component: Video Instance
+ * 视频实例
  * @since 2025-11-20
  */
 export default new class Video {
@@ -68,12 +68,12 @@ export default new class Video {
             return;
         }
 
-        // Update player controls
+        // 更新播放器面板
         video.src = video.source = path;
         player.updateDuration();
         player.displayMetadata();
 
-        // Autoplay audio
+        // 自动播放音频
         if (this.getMetadata("Audio") && !this.getMetadata("Video")) {
             audio.play();
         } else {
@@ -82,6 +82,7 @@ export default new class Video {
         }
     }
 
+    /** 创建转码服务 */
     async transcode() {
         if (!this.transcoded) {
             this.transcoded = true;
@@ -90,6 +91,7 @@ export default new class Video {
         }
     }
 
+    /** 将视频跳转到指定时间 */
     seek(timestamp) {
         if (!isNumeric(timestamp)) return;
         if (timestamp < 0) timestamp = 0;
@@ -103,13 +105,12 @@ export default new class Video {
         }
     }
 
-    // Get metadata by property key
+    /** 根据属性名获取元数据 */
     getMetadata(key) {
         let i = 0, value = this.metadata;
         key = key.split(".");
         while (value && i < key.length) {
-            value = value[key[i]];
-            i++;
+            value = value[key[i++]];
         }
         return isNumeric(value) ? Number(value) : value;
     }

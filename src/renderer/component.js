@@ -1,4 +1,4 @@
-/** Shortcut for query selector or create elements */
+/** 查找或创建DOM元素快捷方式 */
 export function $(selector) {
     selector = selector.replace("/\n/mg", "").trim()
     if (selector.startsWith("<")) {
@@ -7,7 +7,7 @@ export function $(selector) {
     return document.querySelector(selector)
 }
 
-/** Toast Component */
+/** 消息提示组件 */
 export const Toast = new class {
     constructor() {
         this.el = $(".toast>div");
@@ -40,7 +40,7 @@ export const Toast = new class {
     }
 }
 
-/** Loading component */
+/** 进度显示组件 */
 export const Loading = new class {
     constructor() {
         this.loading = $(".loading");

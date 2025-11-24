@@ -1,8 +1,8 @@
 import { formatDuration, parseDuration } from "../main/utils.js";
 import { $, Toast } from "./component.js";
+import recorder from "./recorder.js";
 import video from "./video.js";
 import merger from "./merger.js";
-import recorder from "./recorder.js";
 
 const timeline = $(".timeline");
 const currentTime = $("#currentTime");
@@ -29,7 +29,7 @@ const openFilesBtn = $(".open-files");
 const repoBtn = $(".repo");
 
 /**
- * Component: Video Player
+ * 视频播放组件
  * @since 2025-11-20
  */
 export default new class Player {
@@ -46,7 +46,7 @@ export default new class Player {
             }
         }
 
-        // Create video segment by cut buttons
+        // 设置视频片段的起始点
         cutStartBtn.onclick = () => {
             segmentStartTime.value = formatDuration(video.currentTime);
             this.createSegment();
@@ -56,7 +56,7 @@ export default new class Player {
             this.createSegment();
         }
 
-        // Seek to the beginning or end of the segment
+        // 跳转到视频片段的起始点
         segmentStartBtn.onclick = () => {
             video.seek(parseDuration(segmentStartTime.value));
         }
@@ -64,7 +64,7 @@ export default new class Player {
             video.seek(parseDuration(segmentEndTime.value));
         }
 
-        // Seek to the beginning or end of the video
+        // 跳转到整个视频的起始点
         videoStartBtn.onclick = () => {
             video.seek(0);
         }
@@ -72,26 +72,26 @@ export default new class Player {
             video.seek(video.duration);
         }
 
-        // Seek to timeline position
+        // 跳转到时间轴点击位置
         timeline.onclick = function(e) {
             if (video.duration !== undefined) {
                 video.seek(video.duration * (e.clientX / this.offsetWidth));
             }
         }
 
-        // Create segment by input time
+        // 输入视频片段起始时间
         const self = this;
         segmentStartTime.oninput = segmentEndTime.oninput = function() {
             video.seek(parseDuration(this.value));
             self.createSegment();
         }
 
-        // Take a snapshot of current frame from the video
+        // 截取视频当前帧作为图片
         captureBtn.onclick = function() {
             ffmpeg.captureImage(video.source, video.currentTime);
         }
 
-        // Extract audio from the video segment
+        // 从视频片段中提取音频
         extractBtn.onclick = () => {
             ffmpeg.extractAudio(
                 video.source,
@@ -101,22 +101,22 @@ export default new class Player {
             );
         }
 
-        // Re-encode video segment to regular MP4 and export
+        // 重编码分割视频
         convertBtn.onclick = () => {
             ffmpeg.convertVideo(video.source, this.segmentStartTime, this.segmentEndTime);
         }
 
-        // Lossless cut video segment and export
+        // 无损分割视频
         cutBtn.onclick = () => {
             ffmpeg.cutVideo(video.source, this.segmentStartTime, this.segmentEndTime);
         }
 
-        // Record screen
+        // 录屏和录音
         openRecordBtn.onclick = function() {
             recorder.show();
         }
 
-        // Open video segment files to merge
+        // 打开多选文件对话框
         openFilesBtn.onclick = async function() {
             const { canceled, filePaths } = await electron.openFileDialog(true);
             if (canceled || !filePaths) return;
@@ -127,12 +127,12 @@ export default new class Player {
             }
         }
 
-        // Open github link
+        // 打开 Github 项目仓库
         repoBtn.onclick = function() {
             electron.openExternal("https://github.com/metadream/flawless-cut");
         }
 
-        // Key bindings
+        // 快捷键绑定
         document.onkeyup = function(e) {
             e.preventDefault();
             if (video.duration === undefined) return;
@@ -151,20 +151,20 @@ export default new class Player {
         }
     }
 
-    /** Set filepath to video source */
+    /** 设置视频文件路径 */
     async setSource(filePath) {
         this.resetControls();
         this.enableControls(false);
         await video.setSource(filePath);
     }
 
-    /** Create segment by start and end time */
+    /** 创建视频片段 */
     createSegment() {
         segment.style.left = (parseDuration(segmentStartTime.value) / video.duration) * 100 + "%";
         segment.style.right = (100 - (parseDuration(segmentEndTime.value) / video.duration) * 100) + "%";
     }
 
-    /** Reset controls */
+    /** 重置面板控制元素 */
     resetControls() {
         this.status = "play";
         progress.style.left = "0";
@@ -175,7 +175,7 @@ export default new class Player {
         segmentEndTime.value = "00:00:00.000";
     }
 
-    /** Enable controls */
+    /** 启用或禁用面板控制元素 */
     enableControls(v) {
         v = !v;
         playBtn.disabled = v;
@@ -194,13 +194,13 @@ export default new class Player {
         convertBtn.disabled = v;
     }
 
-    /** Update timeline */
+    /** 更新时间轴 */
     updateTimeline() {
         currentTime.innerHTML = formatDuration(video.currentTime);
         progress.style.left = (video.currentTime / video.duration) * 100 + "%";
     }
 
-    /** Display metadata on the panel */
+    /** 将元数据显示在标题栏 */
     async displayMetadata() {
         const format = video.getMetadata("General.Format") || "";
         const frameRate = video.getMetadata("General.FrameRate");
@@ -214,7 +214,7 @@ export default new class Player {
         document.title = (await electron.getAppName()) + "  |  " + metadata.join(", ");
     }
 
-    /** Update duration */
+    /** 更新播放时长显示 */
     updateDuration() {
         duration.innerHTML = segmentEndTime.value = formatDuration(video.duration);
     }

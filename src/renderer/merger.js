@@ -1,7 +1,7 @@
 import { $ } from "./component.js";
 
 /**
- * Component: Video Merger Panel
+ * 视频合并组件
  * @since 2025-11-20
  */
 export default new class Merger {

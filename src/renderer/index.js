@@ -1,7 +1,7 @@
 import { $, Loading, Toast } from "./component.js";
 import player from "./player.js";
 
-/** Drag to play */
+/** 拖拽文件方式 */
 const fileChooser = $("#file-chooser");
 fileChooser.ondragover = function() {
     return false;
@@ -20,7 +20,7 @@ fileChooser.ondrop = function(e) {
     player.setSource(path);
 }
 
-/** Choose to play */
+/** 选择文件方式 */
 fileChooser.onclick = async function() {
     const { canceled, filePaths } = await electron.openFileDialog();
     if (!canceled && filePaths && filePaths.length === 1) {
@@ -28,10 +28,10 @@ fileChooser.onclick = async function() {
     }
 }
 
-/** Listen ffmpeg process events */
+/** FFMPEG 进程事件监听 */
 ffmpeg.on("process-start", () => Loading.show());
 ffmpeg.on("process-finish", () => Loading.hide());
-ffmpeg.on("process-success", () => Toast.success("File output successful"));
+ffmpeg.on("process-success", () => Toast.success("Process completed."));
 ffmpeg.on("process-progress", (event, progress) => Loading.update(progress));
 ffmpeg.on("process-error", (event, message) => Toast.error(message));
 ffmpeg.on("transcode-error", (event, message) => Toast.error(message));
