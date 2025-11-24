@@ -1,9 +1,9 @@
-/** Detect string is a number or not */
+/** 检测是否为数字 */
 export function isNumeric(string) {
     return Number.isFinite(parseFloat(string))
 }
 
-/** Format date to pattern */
+/** 将日期对象格式化为 yyyy-MM-dd HH:mm:ss.SSS */
 export function formatDate(date) {
     const month = String(date.getMonth() + 1).padStart(2, 0),
         days = String(date.getDate()).padStart(2, 0),
@@ -13,7 +13,7 @@ export function formatDate(date) {
     return `${date.getFullYear()}-${month}-${days} ${hours}.${mins}.${secs}`
 }
 
-/** Format seconds to pattern */
+/** 将毫秒时长格式化为 00:00:00.000 */
 export function formatDuration(_seconds) {
     const seconds = _seconds || 0
     const minutes = seconds / 60
@@ -27,7 +27,7 @@ export function formatDuration(_seconds) {
     return `${hoursPadded}:${minutesPadded}:${secondsPadded}.${msPadded}`
 }
 
-/** Parse duration from string */
+/** 将 00:00:00.000 字符串解析为毫秒时长 */
 export function parseDuration(str) {
     if (!str) return
     const match = str.trim().match(/^(\d{2}):(\d{2}):(\d{2})(\.\d{2,3})$/)

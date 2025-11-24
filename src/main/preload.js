@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
+/** 对渲染进程暴露 electron 相关接口 */
 contextBridge.exposeInMainWorld("electron", {
     getAppName: () => ipcRenderer.invoke("get-app-name"),
     getAppPath: () => ipcRenderer.invoke("get-app-path"),
@@ -13,6 +14,7 @@ contextBridge.exposeInMainWorld("electron", {
     getFilePath: file => webUtils.getPathForFile(file)
 });
 
+/** 对渲染进程暴露 ffmpeg 相关接口 */
 contextBridge.exposeInMainWorld("ffmpeg", {
     getMediaInfo: (...args) => ipcRenderer.invoke("ffmpeg-media-info", ...args),
     cutVideo: (...args) => ipcRenderer.invoke("ffmpeg-cut-video", ...args),

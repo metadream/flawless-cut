@@ -1,15 +1,27 @@
-import { app, dialog, ipcMain, shell } from "electron";
+import { app, dialog, ipcMain, nativeImage, shell, Tray } from "electron";
 import http from "http";
+import path from "path";
 import subprocess from "./subprocess.js";
-import ffmpeg from "./ffmpeg.js";
+import * as ffmpeg from "./ffmpeg.js";
 
-/** Electron methods */
+/** 初始化系统托盘图标 */
+const trayIcon = path.join(app.getAppPath(), "assets/icons/tray.png");
+const recordingIcon = path.join(app.getAppPath(), "assets/icons/recording.png");
+const blinkIcon = nativeImage.createFromPath(recordingIcon).resize({ width: 24, height: 24 });
+const defaultIcon = nativeImage.createFromPath(trayIcon).resize({ width: 24, height: 24 });
+defaultIcon.setTemplateImage(true);
+
+/** 注册常用 IPC 方法 */
 ipcMain.handle("get-app-name", () => app.getName());
 ipcMain.handle("get-app-path", () => app.getAppPath());
 ipcMain.handle("get-desktop", () => app.getPath("desktop"));
+ipcMain.handle("open-file-dialog", (event, multiple) => openMediaDialog(multiple));
 ipcMain.handle("open-external", (event, url) => shell.openExternal(url));
+ipcMain.handle("create-tray", () => createTray());
+ipcMain.handle("remove-tray", () => removeTray());
 
-/** Ffmpeg methods */
+/** 注册 FFMPEG IPC 方法 */
+ipcMain.handle("create-transcode-server", (event, port) => createTranscodeServer(event, port));
 ipcMain.handle("ffmpeg-exit-recording", () => global.recordingProcess.stdin.write("q"));
 ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
 handleFfmpegIpcMethod("ffmpeg-cut-video", (...args) => ffmpeg.cutVideo(...args));
@@ -19,8 +31,8 @@ handleFfmpegIpcMethod("ffmpeg-extract-audio", (...args) => ffmpeg.extractAudio(.
 handleFfmpegIpcMethod("ffmpeg-capture-image", (...args) => ffmpeg.captureImage(...args));
 handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => ffmpeg.recordScreen(...args));
 
-/** Open native dialog */
-ipcMain.handle("open-file-dialog", (event, multiple = false) => {
+/** 打开原生文件选择对话框并限制媒体格式 */
+function openMediaDialog(multiple = false) {
     return dialog.showOpenDialog({
         properties: ["openFile", multiple ? "multiSelections" : false],
         filters: [{
@@ -33,10 +45,10 @@ ipcMain.handle("open-file-dialog", (event, multiple = false) => {
             name: "All Files", extensions: ["*"]
         }]
     });
-});
+}
 
-/** Create video transcode server */
-ipcMain.handle("create-transcode-server", (event, port = 4725) => {
+/** 创建全局视频转码服务 */
+function createTranscodeServer(event, port = 4725) {
     if (global.server) return;
 
     global.server = http.createServer((request, response) => {
@@ -55,9 +67,30 @@ ipcMain.handle("create-transcode-server", (event, port = 4725) => {
     global.server.on("error", e => {
         event.sender.send("transcode-error", e.message);
     });
-});
+}
 
-/** Handle ffmpeg methods and listen events  */
+/** 创建系统托盘 (MacOS为菜单栏图标) */
+function createTray() {
+    let count = 0;
+    global.tray = new Tray(defaultIcon);
+    global.tray.setToolTip("Screen Recording...");
+
+    global.tray.timer = setInterval(() => {
+        tray.setImage(count++ % 2 === 0 ? defaultIcon : blinkIcon);
+    }, 500);
+
+    global.tray.on("click", () => {
+        global.mainWindow.show();
+    });
+}
+
+/** 移除系统托盘 */
+function removeTray() {
+    clearInterval(global.tray.timer);
+    global.tray.destroy();
+}
+
+/** 注册 FFMPEG 方法并监听进程事件 */
 function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
     ipcMain.handle(ipcName, async (event, ...args) => {
         try {
