@@ -1,6 +1,4 @@
 *, *:before, *:after {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
 
@@ -14,7 +12,7 @@
     --gray-color: #999;
     --minor-color: #ccc;
     --bg-color: #eee;
-    --contrast-color: 220, 51, 102; /* #d36;*/
+    --contrast-color: 220, 51, 102; /* #d36 */
     --panel-color: #343d46;
     --ondrag-color: #38424b;
     --timeline-color: #4a5560;
@@ -199,11 +197,10 @@ main canvas {
 .merger button {
     width: 100px;
     margin: 0 10px;
-    color: #fff;
 }
 
 .merger button.merge {
-    background: var(--contrast-color);
+    background: rgb(var(--contrast-color));
 }
 
 .merger button.cancel {
@@ -253,7 +250,6 @@ main canvas {
 .recorder button {
     width: 100%;
     height: 50px;
-    color: #fff;
 }
 
 .recorder button.start {
@@ -262,7 +258,7 @@ main canvas {
 
 .recorder button.stop {
     display: none;
-    background: var(--contrast-color);
+    background: rgb(var(--contrast-color));
 }
 
 /* --------------------------------------------------------
@@ -357,6 +353,7 @@ button {
     opacity: 0.8;
     cursor: pointer;
     font: inherit;
+    color: #fff;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 16px 16px;
