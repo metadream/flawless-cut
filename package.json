@@ -29,7 +29,7 @@
         },
         "mac": {
             "target": [ "dmg" ],
-            "icon": "assets/icons/icon.icns",
+            "icon": "assets/build/icon.icns",
             "extraResources": [
                 {
                     "from": "bin/darwin",

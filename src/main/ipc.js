@@ -5,8 +5,8 @@ import * as subprocess from "./subprocess.js";
 import * as ffmpeg from "./ffmpeg.js";
 
 /** 初始化系统托盘图标 */
-const trayIcon = path.join(app.getAppPath(), "assets/icons/tray.png");
-const recordingIcon = path.join(app.getAppPath(), "assets/icons/recording.png");
+const trayIcon = path.join(app.getAppPath(), "assets/build/tray.png");
+const recordingIcon = path.join(app.getAppPath(), "assets/build/recording.png");
 const blinkIcon = nativeImage.createFromPath(recordingIcon).resize({ width: 24, height: 24 });
 const defaultIcon = nativeImage.createFromPath(trayIcon).resize({ width: 24, height: 24 });
 defaultIcon.setTemplateImage(true);

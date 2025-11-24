@@ -4,7 +4,7 @@ import * as subprocess from "./subprocess.js";
 import "./ipc.js";
 
 const appPath = app.getAppPath();
-const appIcon = path.join(appPath, "assets/icons/icon.png");
+const appIcon = path.join(appPath, "assets/build/icon.png");
 const preload = path.join(appPath, "src/main/preload.js");
 let mainWindow;
 
