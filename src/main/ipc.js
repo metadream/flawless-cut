@@ -5,11 +5,10 @@ import * as subprocess from "./subprocess.js";
 import * as ffmpeg from "./ffmpeg.js";
 
 /** 初始化系统托盘图标 */
-const trayIcon = path.join(app.getAppPath(), "assets/build/tray.png");
-const recordingIcon = path.join(app.getAppPath(), "assets/build/recording.png");
-const blinkIcon = nativeImage.createFromPath(recordingIcon).resize({ width: 24, height: 24 });
-const defaultIcon = nativeImage.createFromPath(trayIcon).resize({ width: 24, height: 24 });
-defaultIcon.setTemplateImage(true);
+const defaultIcon = path.join(app.getAppPath(), "assets/build/tray-default.png");
+const recordingIcon = path.join(app.getAppPath(), "assets/build/tray-recording.png");
+const defaultImage = nativeImage.createFromPath(defaultIcon).resize({ width: 18, height: 18 });
+const recordingImage = nativeImage.createFromPath(recordingIcon).resize({ width: 18, height: 18 });
 
 /** 本地全局变量 */
 let recordingTray = null;
@@ -77,11 +76,11 @@ function createTranscodeServer(event, port = 4725) {
 /** 创建系统托盘 (MacOS为菜单栏图标) */
 function createTray() {
     let count = 0;
-    recordingTray = new Tray(defaultIcon);
+    recordingTray = new Tray(defaultImage);
     recordingTray.setToolTip("Screen Recording...");
 
     recordingTray.timer = setInterval(() => {
-        tray.setImage(count++ % 2 === 0 ? defaultIcon : blinkIcon);
+        recordingTray.setImage(count++ % 2 === 0 ? defaultImage : recordingImage);
     }, 500);
 
     recordingTray.on("click", () => {
