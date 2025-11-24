@@ -73,7 +73,7 @@ export default new class Video {
         player.updateDuration();
         player.displayMediaInfo();
 
-        // 自动播放音频
+        // 显示音频可视化
         if (this.getMetadata("Audio") && !this.getMetadata("Video")) {
             audio.play();
         } else {
