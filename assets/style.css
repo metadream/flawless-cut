@@ -279,11 +279,16 @@ main canvas {
     right: 20px;
     font-size: 11px;
     color: yellow;
-    text-align: right;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
 .metadata.show {
     display: block;
+}
+
+.metadata td:not([align]) {
+    padding: 0 3px;
 }
 
 /* --------------------------------------------------------

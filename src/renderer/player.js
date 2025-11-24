@@ -154,7 +154,7 @@ export default new class Player {
                 case "ArrowRight":
                     video.seek(video.currentTime + 1);
                     break;
-                case "Tab":
+                case "Backquote":
                     infoBtn.click();
                     break;
             }
@@ -225,7 +225,9 @@ export default new class Player {
         if (samplingRate) metadata["Sampling Rate"] = parseFloat((samplingRate / 1000).toFixed(1)) + "kHz";
 
         // 设置元数据面板内容
-        metaInfo.innerHTML = Object.entries(metadata).map(([key, value]) => `${key}: ${value}<br>`).join("");
+        metaInfo.innerHTML = Object.entries(metadata).map(([key, value]) => {
+            return `<tr><td align="left">${key}</td><td>:</td><td align="right">${value}</td></tr>`
+        }).join("");
 
         // 设置标题栏内容
         const filename = video.source.split(/[\\/]/).pop();
