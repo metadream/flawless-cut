@@ -93,6 +93,9 @@ main canvas {
 }
 
 .timeline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
     height: 40px;
     line-height: 40px;
@@ -100,6 +103,10 @@ main canvas {
     background: var(--timeline-color);
     cursor: default;
     user-select: none;
+}
+
+.timeline > span {
+    width: 100px;
 }
 
 .timeline #segment {
