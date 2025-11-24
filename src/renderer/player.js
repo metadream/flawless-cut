@@ -218,15 +218,21 @@ export default new class Player {
         const frameRate = video.getMetadata("General.FrameRate");
         const bitRate = video.getMetadata("General.OverallBitRate");
         const samplingRate = video.getMetadata("Audio.SamplingRate");
-
         const metadata = { Format: format };
+
+        if (video.getMetadata("Video")) {
+            const width = video.getMetadata("Video.Width");
+            const height = video.getMetadata("Video.Height");
+            metadata["Dimensions"] = width + "×" + height;
+        }
+
         if (frameRate) metadata["Frame Rate"] = parseFloat(frameRate.toFixed(2)) + "fps";
         if (bitRate) metadata["Bit Rate"] = Math.round(bitRate / 1000) + "kbps";
         if (samplingRate) metadata["Sampling Rate"] = parseFloat((samplingRate / 1000).toFixed(1)) + "kHz";
 
         // 设置元数据面板内容
         metaInfo.innerHTML = Object.entries(metadata).map(([key, value]) => {
-            return `<tr><td align="left">${key}</td><td>:</td><td align="right">${value}</td></tr>`
+            return `<tr><td align="right">${key}</td><td>:</td><td align="left">${value}</td></tr>`
         }).join("");
 
         // 设置标题栏内容
