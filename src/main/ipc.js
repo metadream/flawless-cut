@@ -11,6 +11,11 @@ const blinkIcon = nativeImage.createFromPath(recordingIcon).resize({ width: 24, 
 const defaultIcon = nativeImage.createFromPath(trayIcon).resize({ width: 24, height: 24 });
 defaultIcon.setTemplateImage(true);
 
+/** 本地全局变量 */
+let recordingTray = null;
+let recordingProcess = null;
+let transcodeServer = null;
+
 /** 注册常用 IPC 方法 */
 ipcMain.handle("get-app-name", () => app.getName());
 ipcMain.handle("get-app-path", () => app.getAppPath());
@@ -22,7 +27,7 @@ ipcMain.handle("remove-tray", () => removeTray());
 
 /** 注册 FFMPEG IPC 方法 */
 ipcMain.handle("create-transcode-server", (event, port) => createTranscodeServer(event, port));
-ipcMain.handle("ffmpeg-exit-recording", () => global.recordingProcess.stdin.write("q"));
+ipcMain.handle("ffmpeg-exit-recording", () => recordingProcess.stdin.write("q"));
 ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
 handleFfmpegIpcMethod("ffmpeg-cut-video", (...args) => ffmpeg.cutVideo(...args));
 handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(...args));
@@ -49,9 +54,9 @@ function openMediaDialog(multiple = false) {
 
 /** 创建全局视频转码服务 */
 function createTranscodeServer(event, port = 4725) {
-    if (global.server) return;
+    if (transcodeServer) return;
 
-    global.server = http.createServer((request, response) => {
+    transcodeServer = http.createServer((request, response) => {
         const url = new URL(request.url, `http://${request.headers.host}`);
         const params = Object.fromEntries(url.searchParams);
         const proc = ffmpeg.fastCodec(params.source, params.fileSize, params.startTime);
@@ -64,7 +69,7 @@ function createTranscodeServer(event, port = 4725) {
         });
     }).listen(port);
 
-    global.server.on("error", e => {
+    transcodeServer.on("error", e => {
         event.sender.send("transcode-error", e.message);
     });
 }
@@ -72,22 +77,22 @@ function createTranscodeServer(event, port = 4725) {
 /** 创建系统托盘 (MacOS为菜单栏图标) */
 function createTray() {
     let count = 0;
-    global.tray = new Tray(defaultIcon);
-    global.tray.setToolTip("Screen Recording...");
+    recordingTray = new Tray(defaultIcon);
+    recordingTray.setToolTip("Screen Recording...");
 
-    global.tray.timer = setInterval(() => {
+    recordingTray.timer = setInterval(() => {
         tray.setImage(count++ % 2 === 0 ? defaultIcon : blinkIcon);
     }, 500);
 
-    global.tray.on("click", () => {
+    recordingTray.on("click", () => {
         global.mainWindow.show();
     });
 }
 
 /** 移除系统托盘 */
 function removeTray() {
-    clearInterval(global.tray.timer);
-    global.tray.destroy();
+    clearInterval(recordingTray.timer);
+    recordingTray.destroy();
 }
 
 /** 注册 FFMPEG 方法并监听进程事件 */
@@ -119,7 +124,7 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
                 proc.on("exit", () => {
                     event.sender.send("recording-exit");
                 });
-                global.recordingProcess = proc;
+                recordingProcess = proc;
             }
 
             subprocess.register(proc);
