@@ -201,17 +201,20 @@ export default new class Player {
     }
 
     /** 将元数据显示在标题栏 */
-    async displayMetadata() {
-        const format = video.getMetadata("General.Format") || "";
-        const frameRate = video.getMetadata("General.FrameRate");
-        const bitRate = video.getMetadata("General.OverallBitRate");
-        const samplingRate = video.getMetadata("Audio.SamplingRate");
+    async displayTitleName() {
+        // const format = video.getMetadata("General.Format") || "";
+        // const frameRate = video.getMetadata("General.FrameRate");
+        // const bitRate = video.getMetadata("General.OverallBitRate");
+        // const samplingRate = video.getMetadata("Audio.SamplingRate");
+        //
+        // const metadata = [format];
+        // if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
+        // if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
+        // if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
+        // document.title = (await electron.getAppName()) + "  |  " + metadata.join(", ");
 
-        const metadata = [format];
-        if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
-        if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
-        if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
-        document.title = (await electron.getAppName()) + "  |  " + metadata.join(", ");
+        const filename = video.source.split(/[\\/]/).pop();
+        document.title = (await electron.getAppName()) + "  |  " + filename;
     }
 
     /** 更新播放时长显示 */
