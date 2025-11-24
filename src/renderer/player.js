@@ -21,6 +21,7 @@ const segmentEndBtn = $(".segment-end");
 const cutStartBtn = $(".cut-start");
 const cutEndBtn = $(".cut-end");
 
+const infoBtn = $(".info");
 const cutBtn = $(".cut");
 const captureBtn = $(".capture");
 const extractBtn = $(".extract");
@@ -128,6 +129,11 @@ export default new class Player {
             }
         }
 
+        // 打开元数据面板
+        infoBtn.onclick = function() {
+            metaInfo.classList.toggle("show");
+        }
+
         // 打开 Github 项目仓库
         repoBtn.onclick = function() {
             electron.openExternal("https://github.com/metadream/flawless-cut");
@@ -147,6 +153,9 @@ export default new class Player {
                     break;
                 case "ArrowRight":
                     video.seek(video.currentTime + 1);
+                    break;
+                case "Tab":
+                    infoBtn.click();
                     break;
             }
         }
@@ -174,6 +183,7 @@ export default new class Player {
         duration.innerHTML = "00:00:00.000";
         segmentStartTime.value = "00:00:00.000";
         segmentEndTime.value = "00:00:00.000";
+        metaInfo.innerHTML = "";
     }
 
     /** 启用或禁用面板控制元素 */
@@ -189,6 +199,7 @@ export default new class Player {
         segmentStartTime.disabled = v;
         segmentEndTime.disabled = v;
 
+        infoBtn.disabled = v;
         cutBtn.disabled = v;
         captureBtn.disabled = v;
         extractBtn.disabled = v;
