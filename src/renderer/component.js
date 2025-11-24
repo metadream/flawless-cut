@@ -17,7 +17,7 @@ export const Toast = new class {
         this.el.innerHTML = message;
         this.el.classList.add("visible");
 
-        // Auto hide
+        // 3秒后自动隐藏
         if (this.timer) clearTimeout(this.timer);
         this.timer = setTimeout(() => {
             this.el.classList.remove("visible");

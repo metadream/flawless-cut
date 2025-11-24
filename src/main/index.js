@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
-import subprocess from "./subprocess.js";
+import * as subprocess from "./subprocess.js";
 import "./ipc.js";
 
 const appPath = app.getAppPath();

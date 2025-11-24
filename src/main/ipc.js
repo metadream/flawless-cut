@@ -1,7 +1,7 @@
 import { app, dialog, ipcMain, nativeImage, shell, Tray } from "electron";
 import http from "http";
 import path from "path";
-import subprocess from "./subprocess.js";
+import * as subprocess from "./subprocess.js";
 import * as ffmpeg from "./ffmpeg.js";
 
 /** 初始化系统托盘图标 */
