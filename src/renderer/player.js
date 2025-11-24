@@ -4,6 +4,7 @@ import recorder from "./recorder.js";
 import video from "./video.js";
 import merger from "./merger.js";
 
+const metaInfo = $('.metadata');
 const timeline = $(".timeline");
 const currentTime = $("#currentTime");
 const duration = $("#duration");
@@ -200,19 +201,22 @@ export default new class Player {
         progress.style.left = (video.currentTime / video.duration) * 100 + "%";
     }
 
-    /** 将元数据显示在标题栏 */
-    async displayTitleName() {
-        // const format = video.getMetadata("General.Format") || "";
-        // const frameRate = video.getMetadata("General.FrameRate");
-        // const bitRate = video.getMetadata("General.OverallBitRate");
-        // const samplingRate = video.getMetadata("Audio.SamplingRate");
-        //
-        // const metadata = [format];
-        // if (frameRate) metadata.push(parseFloat(frameRate.toFixed(2)) + "fps");
-        // if (bitRate) metadata.push(Math.round(bitRate / 1000) + "kbps");
-        // if (samplingRate) metadata.push(parseFloat((samplingRate / 1000).toFixed(1)) + "kHz");
-        // document.title = (await electron.getAppName()) + "  |  " + metadata.join(", ");
+    /** 显示媒体信息 */
+    async displayMediaInfo() {
+        const format = video.getMetadata("General.Format") || "";
+        const frameRate = video.getMetadata("General.FrameRate");
+        const bitRate = video.getMetadata("General.OverallBitRate");
+        const samplingRate = video.getMetadata("Audio.SamplingRate");
 
+        const metadata = { Format: format };
+        if (frameRate) metadata["Frame Rate"] = parseFloat(frameRate.toFixed(2)) + "fps";
+        if (bitRate) metadata["Bit Rate"] = Math.round(bitRate / 1000) + "kbps";
+        if (samplingRate) metadata["Sampling Rate"] = parseFloat((samplingRate / 1000).toFixed(1)) + "kHz";
+
+        // 设置元数据面板内容
+        metaInfo.innerHTML = Object.entries(metadata).map(([key, value]) => `${key}: ${value}<br>`).join("");
+
+        // 设置标题栏内容
         const filename = video.source.split(/[\\/]/).pop();
         document.title = (await electron.getAppName()) + "  |  " + filename;
     }

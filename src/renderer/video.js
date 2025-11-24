@@ -71,7 +71,7 @@ export default new class Video {
         // 更新播放器面板
         video.src = video.source = path;
         player.updateDuration();
-        player.displayTitleName();
+        player.displayMediaInfo();
 
         // 自动播放音频
         if (this.getMetadata("Audio") && !this.getMetadata("Video")) {
