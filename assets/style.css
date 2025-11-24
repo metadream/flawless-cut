@@ -12,11 +12,13 @@
 :root {
     --font-color: #333;
     --gray-color: #999;
+    --minor-color: #ccc;
     --bg-color: #eee;
     --contrast-color: 220, 51, 102; /* #d36;*/
     --panel-color: #343d46;
     --ondrag-color: #38424b;
     --timeline-color: #4a5560;
+    --split-color: #67737f;
     --text-size: 14px;
     --title-size: 30px;
 }
@@ -30,7 +32,7 @@ body {
 }
 
 /* --------------------------------------------------------
- * Main Layout
+ * Layout Main
  * ----------------------------------------------------- */
 
 main {
@@ -64,7 +66,7 @@ main canvas {
     bottom: 60px;
     left: 60px;
     right: 60px;
-    font-size: 30px;
+    font-size: var(--title-size);
     color: var(--timeline-color);
     border: var(--timeline-color) 3px dashed;
     display: flex;
@@ -79,7 +81,7 @@ main canvas {
 }
 
 /* --------------------------------------------------------
- * Toolbar Layout
+ * Layout Toolbar
  * ----------------------------------------------------- */
 
 .toolbar {
@@ -114,12 +116,12 @@ main canvas {
     top: 0;
     bottom: 0;
     left: 0;
-    background: var(--gray-color);
     width: 1px;
+    background: var(--gray-color);
 }
 
 .controls {
-    border-bottom: #ccc 1px solid;
+    border-bottom: var(--minor-color) 1px solid;
 }
 
 .controls input {
@@ -139,31 +141,31 @@ main canvas {
 }
 
 /* --------------------------------------------------------
- * Merger Component
+ * Component Merger
  * ----------------------------------------------------- */
 
 .merger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    background: #eee;
-    display: none;
-    flex-direction: column;
-    justify-content: space-between;
+    background: var(--bg-color);
 }
 
 .merger .content {
     flex: 1;
-    background: #4a5560;
-    color: #ccc;
-    overflow-y: auto;
+    background: var(--timeline-color);
+    color: var(--minor-color);
     padding: 60px;
+    overflow-y: auto;
 }
 
 .merger .title {
-    font-size: 30px;
+    font-size: var(--title-size);
     text-align: right;
 }
 
@@ -184,12 +186,11 @@ main canvas {
     top: 0;
     right: 0;
     height: 1px;
-    background: #5d6872;
+    background: var(--split-color);
 }
 
 .merger .footer {
     height: 80px;
-    background: #eee;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -202,15 +203,15 @@ main canvas {
 }
 
 .merger button.merge {
-    background: #d36;
+    background: var(--contrast-color);
 }
 
 .merger button.cancel {
-    background: #999;
+    background: var(--gray-color);
 }
 
 /* --------------------------------------------------------
- * Recorder Component
+ * Component Recorder
  * ----------------------------------------------------- */
 
 .recorder {
@@ -221,7 +222,7 @@ main canvas {
     right: 0;
     opacity: 0;
     visibility: hidden;
-    background-color: #343d46;
+    background-color: var(--panel-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -246,7 +247,7 @@ main canvas {
 
 .recorder > div > div {
     padding: 20px 30px;
-    font-size: 30px;
+    font-size: var(--title-size);
 }
 
 .recorder button {
@@ -256,16 +257,16 @@ main canvas {
 }
 
 .recorder button.start {
-    background: #4a5560;
+    background: var(--timeline-color);
 }
 
 .recorder button.stop {
     display: none;
-    background: #d36;
+    background: var(--contrast-color);
 }
 
 /* --------------------------------------------------------
- * Loading Component
+ * Component Loading
  * ----------------------------------------------------- */
 
 .loading {
@@ -287,26 +288,22 @@ main canvas {
 }
 
 .loading .pointer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     width: 100%;
     height: 100%;
     color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* --------------------------------------------------------
- * Toast Component
+ * Component Toast
  * ----------------------------------------------------- */
 
 .toast {
@@ -326,7 +323,7 @@ main canvas {
     z-index: 999;
     top: -100px;
     color: #fff;
-    background: rgba(90, 90, 90, .8);
+    background: var(--split-color);
     padding: 10px 20px;
     border-radius: 3px;
     transition: top .5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
