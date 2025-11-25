@@ -27,17 +27,10 @@ export default new class Recorder {
         // 监听录制过程事件
         ffmpeg.on("recording-update", (event, time) => {
             this.duration.innerHTML = time;
-            if (!this.started) {
-                this.started = true;
-                this.startBtn.style.display = "none";
-                this.stopBtn.style.display = "block";
-                this.stopBtn.disabled = false;
-            }
         });
 
         // 监听录制退出事件
         ffmpeg.on("recording-exit", () => {
-            this.started = false;
             this.startBtn.disabled = false;
             this.startBtn.style.display = "block";
             this.stopBtn.style.display = "none";
@@ -49,8 +42,11 @@ export default new class Recorder {
 
     async startRecording() {
         this.startBtn.disabled = true;
+        this.stopBtn.disabled = false;
+        this.startBtn.style.display = "none";
+        this.stopBtn.style.display = "block";
         this.container.onclick = null;
-        await ffmpeg.recordScreen(await electron.getDesktop());
+        ffmpeg.recordScreen(await electron.getDesktop());
     }
 
     stopRecording() {
