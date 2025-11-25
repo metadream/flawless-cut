@@ -26,16 +26,16 @@ if (!gotTheLock) { app.quit() } else {
             if (mainWindow === null) createWindow();
         });
 
-        // 应用退出前结束当前Ffmpeg进程
-        // app.on('before-quit', () => {
-        //     if (global.ffmpegProcess && global.ffmpegProcess.kill) {
-        //         try {
-        //             global.ffmpegProcess.kill();
-        //         } catch (error) {
-        //             // Ignored
-        //         }
-        //     }
-        // });
+        // 应用退出前结束正在执行的Ffmpeg进程
+        app.on('before-quit', () => {
+            if (global.ffmpegProcess && global.ffmpegProcess.kill) {
+                try {
+                    global.ffmpegProcess.kill();
+                } catch (error) {
+                    // Ignored
+                }
+            }
+        });
     });
 
     // 所有窗口关闭后事件
@@ -93,5 +93,6 @@ function createWindow() {
     // 若应用支持多窗口模式，通常会将窗口存储在数组中，此时应删除对应的元素。
     mainWindow.on("closed", function() {
         mainWindow = global.mainWindow = null;
+        isQuitting = false;
     });
 }

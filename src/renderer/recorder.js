@@ -31,12 +31,16 @@ export default new class Recorder {
 
         // 监听录制退出事件
         ffmpeg.on("recording-exit", () => {
-            this.startBtn.disabled = false;
-            this.startBtn.style.display = "block";
-            this.stopBtn.style.display = "none";
-            this.duration.innerHTML = "00:00:00.00";
-            this.container.onclick = e => this.onMaskClick(e);
+            this.resetControls();
             this.hide();
+        });
+
+        ffmpeg.on("process-error", () => {
+            this.resetControls();
+        });
+
+        ffmpeg.on("ipc-error", () => {
+            this.resetControls();
         });
     }
 
@@ -52,6 +56,14 @@ export default new class Recorder {
     stopRecording() {
         this.stopBtn.disabled = true;
         ffmpeg.exitRecording();
+    }
+
+    resetControls() {
+        this.startBtn.disabled = false;
+        this.startBtn.style.display = "block";
+        this.stopBtn.style.display = "none";
+        this.duration.innerHTML = "00:00:00.00";
+        this.container.onclick = e => this.onMaskClick(e);
     }
 
     onMaskClick(e) {

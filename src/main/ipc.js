@@ -111,8 +111,11 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
                 event.sender.send("process-progress", p);
             });
             proc.emitter.on("complete", () => {
-                event.sender.send("process-complete");
                 global.ffmpegProcess = null;
+                // 防止应用强制退出后IPC仍旧发送数据导致报错
+                if (!event.sender.isDestroyed()) {
+                    event.sender.send("process-complete");
+                }
             });
             proc.emitter.on("error", e => {
                 event.sender.send("process-error", e.message);
@@ -123,13 +126,13 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
                     createTray();
                 });
                 proc.emitter.on("timeupdate", t => {
-                    if (!event.sender.isDestroyed()) {  // 防止应用强制退出后IPC仍旧发送数据导致报错
+                    if (!event.sender.isDestroyed()) {
                         event.sender.send("recording-update", t);
                     }
                 });
                 proc.on("exit", () => {
                     removeTray();
-                    if (!event.sender.isDestroyed()) {  // 防止应用强制退出后IPC仍旧发送数据导致报错
+                    if (!event.sender.isDestroyed()) {
                         event.sender.send("recording-exit");
                     }
                 });
