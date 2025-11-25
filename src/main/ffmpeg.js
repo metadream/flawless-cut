@@ -1,4 +1,4 @@
-import { execFile, execFileSync } from "child_process";
+import { execFileSync } from "child_process";
 import { formatDate, formatDuration, parseDuration } from "./utils.js";
 import { app } from "electron";
 import { EventEmitter } from "events";
@@ -60,14 +60,14 @@ export function convertVideo(inputFile, startTime, endTime) {
 }
 
 /** 录屏录音 */
-export async function recordScreen(outputPath) {
+export function recordScreen(outputPath) {
     const outputFile = path.join(outputPath, "screen-record-" + formatDate(new Date()) + ".mp4");
     let args = null;
 
     switch (platform) {
         // Windows需要获取录音设备名称
         case "win32":
-            const audioDevice = await getAudioDevice();
+            const audioDevice = getAudioDevice();
             const audioArgs = audioDevice ? ["-f", "dshow", "-i", "audio=" + audioDevice] : [];
             args = ["-f", "gdigrab", "-i", "desktop", ...audioArgs];
             break;
@@ -192,19 +192,25 @@ function ffmpegCommand(args, options) {
 
 /** 获取 Windows 音频输入设备 */
 function getAudioDevice() {
-    return new Promise(resolve => {
-        execFile(ffmpeg, ["-list_devices", "true", "-f", "dshow", "-i", "dummy"], (_error, _stdout, stderr) => {
-            const lines = stderr.split("\n");
-            lines.some((line, i) => {
-                let match = /^\[dshow.+\] DirectShow audio devices$/.exec(line.trim());
-                if (match) {
-                    match = /^\[dshow.+\] +"(.+)"$/.exec(lines[i + 1].trim());
-                    if (match) resolve(match[1]);
-                    return true;
-                }
-            });
+    try {
+        execFileSync(ffmpeg, ["-list_devices", "true", "-f", "dshow", "-i", "dummy"], {
+            encoding: 'utf8'
         });
-    });
+    } catch (error) {
+        // 设备信息包含在标准错误输出中
+        const stderr = error.stderr || "";
+        const lines = stderr.split("\n");
+
+        // 解析设备名称
+        for (let i = 0; i < lines.length; i++) {
+            let match = /^\[dshow.+\] DirectShow audio devices$/.exec(lines[i].trim());
+            if (match) {
+                match = /^\[dshow.+\] +"(.+)"$/.exec(lines[i + 1].trim());
+                if (match) return match[1];
+            }
+        }
+        return null;
+    }
 }
 
 /** 将起止时间解析为以秒为单位 */
