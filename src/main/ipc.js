@@ -103,14 +103,11 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
             proc.emitter.on("start", () => {
                 event.sender.send("process-start");
             });
-            proc.emitter.on("finish", () => {
-                event.sender.send("process-finish");
-            });
-            proc.emitter.on("success", () => {
-                event.sender.send("process-success");
-            });
             proc.emitter.on("progress", p => {
                 event.sender.send("process-progress", p);
+            });
+            proc.emitter.on("complete", () => {
+                event.sender.send("process-complete");
             });
             proc.emitter.on("error", e => {
                 event.sender.send("process-error", e.message);

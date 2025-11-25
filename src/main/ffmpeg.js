@@ -1,4 +1,4 @@
-import { execFileSync } from "child_process";
+import { execFileSync, spawn } from "child_process";
 import { formatDate, formatDuration, parseDuration } from "./utils.js";
 import { app } from "electron";
 import { EventEmitter } from "events";
@@ -159,22 +159,10 @@ export function fastCodec(inputFile, fileSize, startTime) {
 function ffmpegCommand(args, options) {
     const emitter = new EventEmitter();
     emitter.emit("start");
+    const proc = spawn(ffmpeg, args, options);
 
-    const process = execFile(ffmpeg, args, options, (error, _stdout, stderr) => {
-        if (stderr instanceof Buffer) return;
-        emitter.emit("finish");
-
-        if (error) {
-            error = error.toString().trim();
-            error = error.substring(error.lastIndexOf("\n") + 1);
-            error = error.substring(error.lastIndexOf(":") + 1);
-            emitter.emit("error", new Error(error));
-        } else {
-            emitter.emit("success");
-        }
-    });
-
-    process.stderr.on("data", data => {
+    // Ffmpeg的进度信息包含在标准错误输出中
+    proc.stderr.on('data', (data) => {
         const match = / time=(\d{2}:\d{2}:\d{2}\.\d{2,3}) /.exec(data);
         if (match) {
             emitter.emit("timeupdate", match[1]);
@@ -187,6 +175,20 @@ function ffmpegCommand(args, options) {
             }
         }
     });
+
+    // 进程正常结束
+    proc.on('close', () => {
+        emitter.emit("complete");
+    });
+
+    // 无法创建进程或进程启动失败
+    proc.on('error', (error) => {
+        error = error.toString().trim();
+        error = error.substring(error.lastIndexOf("\n") + 1);
+        error = error.substring(error.lastIndexOf(":") + 1);
+        emitter.emit("error", new Error(error));
+    });
+
     return Object.assign(process, { emitter });
 }
 

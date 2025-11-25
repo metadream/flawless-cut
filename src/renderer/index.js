@@ -29,9 +29,21 @@ fileChooser.onclick = async function() {
 }
 
 /** FFMPEG 进程事件监听 */
-ffmpeg.on("process-start", () => Loading.show());
-ffmpeg.on("process-finish", () => Loading.hide());
-ffmpeg.on("process-success", () => Toast.success("Process completed."));
-ffmpeg.on("process-progress", (event, progress) => Loading.update(progress));
-ffmpeg.on("process-error", (event, message) => Toast.error(message));
-ffmpeg.on("transcode-error", (event, message) => Toast.error(message));
+ffmpeg.on("process-start", () => {
+    Loading.show();
+});
+ffmpeg.on("process-progress", (event, progress) => {
+    Loading.update(progress);
+});
+ffmpeg.on("process-complete", () => {
+    Loading.hide();
+    Toast.success("Process completed.")
+});
+ffmpeg.on("process-error", (event, message) => {
+    Loading.hide();
+    Toast.error(message);
+});
+ffmpeg.on("transcode-error", (event, message) => {
+    Loading.hide();
+    Toast.error(message);
+});
