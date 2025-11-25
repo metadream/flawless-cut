@@ -1,4 +1,4 @@
-import { execFile } from "child_process";
+import { execFile, execFileSync } from "child_process";
 import { formatDate, formatDuration, parseDuration } from "./utils.js";
 import { app } from "electron";
 import { EventEmitter } from "events";
@@ -13,21 +13,19 @@ const ffmpeg = getExecutablePath("ffmpeg");
 
 /** 获取媒体元数据 */
 export function getMediaInfo(inputFile) {
-    return new Promise((resolve, reject) => {
-        execFile(mediainfo, [inputFile, "--Output=JSON"], (error, stdout) => {
-            if (error) {
-                reject(new Error("Failed to get media metadata."));
-                return;
-            }
-            if (stdout.trim()) {
-                const mediaTrack = JSON.parse(stdout).media.track;
-                const mediaInfo = {};
-                // @type: General, Video, Audio, ...
-                mediaTrack.forEach(track => mediaInfo[track["@type"]] = track);
-                resolve(mediaInfo);
-            }
-        });
-    });
+    try {
+        const stdout = execFileSync(mediainfo, [inputFile, "--Output=JSON"],
+            { encoding: 'utf8' });
+        if (stdout.trim()) {
+            const mediaTrack = JSON.parse(stdout).media.track;
+            const mediaInfo = {};
+            // @type: General, Video, Audio, ...
+            mediaTrack.forEach(track => mediaInfo[track["@type"]] = track);
+            return mediaInfo;
+        }
+    } catch (error) {
+        throw new Error("Failed to get metadata from input file.");
+    }
 }
 
 /** 无损分割视频 */
