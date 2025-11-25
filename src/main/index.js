@@ -1,6 +1,5 @@
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
-import * as subprocess from "./subprocess.js";
 import "./ipc.js";
 
 const appPath = app.getAppPath();
@@ -23,19 +22,23 @@ if (!gotTheLock) { app.quit() } else {
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
     app.whenReady().then(() => {
-        app.on("before-quit", () => subprocess.killAll());
-        app.on("will-quit", () => subprocess.killAll());
-        process.on("uncaughtException", () => subprocess.killAll());
-        process.on("exit", () => subprocess.killAll());
-        process.on("SIGINT", () => subprocess.killAll());
-        process.on("SIGTERM", () => subprocess.killAll());
-
         createWindow();
         app.on("activate", function() {
             // On macOS it's common to re-create a window in the app when the
             // dock icon is clicked and there are no other windows open.
             if (mainWindow === null) createWindow();
         });
+
+        // Kill the ffmpeg process when quit
+        // app.on('before-quit', () => {
+        //     if (global.ffmpegProcess && global.ffmpegProcess.kill) {
+        //         try {
+        //             global.ffmpegProcess.kill();
+        //         } catch (error) {
+        //             // Ignored
+        //         }
+        //     }
+        // });
     });
 
     // Quit when all windows are closed.

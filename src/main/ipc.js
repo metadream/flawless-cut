@@ -1,7 +1,6 @@
 import { app, dialog, ipcMain, nativeImage, shell, Tray } from "electron";
 import http from "http";
 import path from "path";
-import * as subprocess from "./subprocess.js";
 import * as ffmpeg from "./ffmpeg.js";
 
 /** 初始化系统托盘图标 */
@@ -11,9 +10,8 @@ const defaultImage = nativeImage.createFromPath(defaultIcon).resize({ width: 18,
 const recordingImage = nativeImage.createFromPath(recordingIcon).resize({ width: 18, height: 18 });
 
 /** 本地全局变量 */
-let recordingTray = null;
-let recordingProcess = null;
 let transcodeServer = null;
+let recordingTray = null;
 
 /** 注册常用 IPC 方法 */
 ipcMain.handle("get-app-name", () => app.getName());
@@ -26,7 +24,7 @@ ipcMain.handle("remove-tray", () => removeTray());
 
 /** 注册 FFMPEG IPC 方法 */
 ipcMain.handle("create-transcode-server", (event, port) => createTranscodeServer(event, port));
-ipcMain.handle("ffmpeg-exit-recording", () => recordingProcess.stdin.write("q"));
+ipcMain.handle("ffmpeg-exit-recording", () => global.ffmpegProcess.stdin.write("q"));
 ipcMain.handle("ffmpeg-media-info", (event, path) => ffmpeg.getMediaInfo(path));
 handleFfmpegIpcMethod("ffmpeg-cut-video", (...args) => ffmpeg.cutVideo(...args));
 handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(...args));
@@ -97,8 +95,14 @@ function removeTray() {
 /** 注册 FFMPEG 方法并监听进程事件 */
 function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
     ipcMain.handle(ipcName, async (event, ...args) => {
+        if (global.ffmpegProcess) {
+            event.sender.send("ipc-error", "Wait for the previous operation to complete.");
+            return;
+        }
+
         try {
             const proc = await ffmpegMethod(...args);
+            global.ffmpegProcess = proc;
 
             proc.emitter.on("start", () => {
                 event.sender.send("process-start");
@@ -108,6 +112,7 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
             });
             proc.emitter.on("complete", () => {
                 event.sender.send("process-complete");
+                global.ffmpegProcess = null;
             });
             proc.emitter.on("error", e => {
                 event.sender.send("process-error", e.message);
@@ -115,18 +120,18 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
 
             if (ipcName === "ffmpeg-record-screen") {
                 proc.emitter.on("timeupdate", t => {
-                    event.sender.send("recording-update", t);
+                    if (!event.sender.isDestroyed()) {  // 防止应用强制退出后IPC仍旧发送数据导致报错
+                        event.sender.send("recording-update", t);
+                    }
                 });
                 proc.on("exit", () => {
-                    event.sender.send("recording-exit");
+                    if (!event.sender.isDestroyed()) {  // 防止应用强制退出后IPC仍旧发送数据导致报错
+                        event.sender.send("recording-exit");
+                    }
                 });
-                recordingProcess = proc;
             }
-
-            subprocess.register(proc);
-            return proc.pid;
         } catch (e) {
-            event.sender.send("process-error", e.message);
+            event.sender.send("ipc-error", e.message);
         }
     });
 }

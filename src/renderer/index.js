@@ -47,3 +47,6 @@ ffmpeg.on("transcode-error", (event, message) => {
     Loading.hide();
     Toast.error(message);
 });
+ffmpeg.on("ipc-error", (event, message) => {
+    Toast.error(message);
+});
