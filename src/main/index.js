@@ -29,7 +29,7 @@ if (!gotTheLock) { app.quit() } else {
             if (mainWindow === null) createWindow();
         });
 
-        // Kill the ffmpeg process when quit
+        // Kill ffmpeg process before app quit
         // app.on('before-quit', () => {
         //     if (global.ffmpegProcess && global.ffmpegProcess.kill) {
         //         try {
