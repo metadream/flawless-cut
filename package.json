@@ -48,10 +48,7 @@
                     "to": "bin"
                 }
             ],
-            "category": "public.app-category.productivity",
-            "extendInfo": {
-                "CFBundleDisplayName": "Flawless Cut"
-            }
+            "category": "public.app-category.productivity"
         }
     },
     "devDependencies": {
