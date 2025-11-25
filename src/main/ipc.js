@@ -94,14 +94,14 @@ function removeTray() {
 
 /** 注册 FFMPEG 方法并监听进程事件 */
 function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
-    ipcMain.handle(ipcName, async (event, ...args) => {
+    ipcMain.handle(ipcName, (event, ...args) => {
         if (global.ffmpegProcess) {
             event.sender.send("ipc-error", "Wait for the previous operation to complete.");
             return;
         }
 
         try {
-            const proc = await ffmpegMethod(...args);
+            const proc = ffmpegMethod(...args);
             global.ffmpegProcess = proc;
 
             proc.emitter.on("start", () => {
@@ -119,12 +119,16 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
             });
 
             if (ipcName === "ffmpeg-record-screen") {
+                proc.emitter.on("start", () => {
+                    createTray();
+                });
                 proc.emitter.on("timeupdate", t => {
                     if (!event.sender.isDestroyed()) {  // 防止应用强制退出后IPC仍旧发送数据导致报错
                         event.sender.send("recording-update", t);
                     }
                 });
                 proc.on("exit", () => {
+                    removeTray();
                     if (!event.sender.isDestroyed()) {  // 防止应用强制退出后IPC仍旧发送数据导致报错
                         event.sender.send("recording-exit");
                     }

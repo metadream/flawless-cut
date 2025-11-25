@@ -32,7 +32,6 @@ export default new class Recorder {
                 this.startBtn.style.display = "none";
                 this.stopBtn.style.display = "block";
                 this.stopBtn.disabled = false;
-                electron.createTray();
             }
         });
 
@@ -45,7 +44,6 @@ export default new class Recorder {
             this.duration.innerHTML = "00:00:00.00";
             this.container.onclick = e => this.onMaskClick(e);
             this.hide();
-            electron.removeTray();
         });
     }
 

@@ -102,23 +102,23 @@ export function mergeVideos(inputFiles) {
     fs.writeFileSync(tmpFile, fileList);
 
     const outputFile = inputFiles[0] + "-merged" + path.extname(inputFiles[0]);
-    const process = ffmpegCommand([
+    const proc = ffmpegCommand([
         "-f", "concat", "-safe", "0",
         "-i", tmpFile, "-c", "copy", "-y", outputFile
     ]);
 
     // 删除临时文件
-    process.on("error", () => {
+    proc.on("error", () => {
         if (fs.existsSync(tmpFile)) {
             fs.unlinkSync(tmpFile);
         }
     });
-    process.on("close", (err) => {
+    proc.on("close", () => {
         if (fs.existsSync(tmpFile)) {
             fs.unlinkSync(tmpFile);
         }
     });
-    return process;
+    return proc;
 }
 
 /** 从视频中提取音频 */
@@ -158,8 +158,12 @@ export function fastCodec(inputFile, fileSize, startTime) {
 /** 执行 FFMPEG 命令 */
 function ffmpegCommand(args, options) {
     const emitter = new EventEmitter();
-    emitter.emit("start");
     const proc = spawn(ffmpeg, args, options);
+
+    // 监听进程开始事件
+    proc.on('spawn', () => {
+        emitter.emit("start");
+    });
 
     // Ffmpeg的进度信息包含在标准错误输出中
     proc.stderr.on('data', (data) => {
@@ -189,7 +193,7 @@ function ffmpegCommand(args, options) {
         emitter.emit("error", new Error(error));
     });
 
-    return Object.assign(process, { emitter });
+    return Object.assign(proc, { emitter });
 }
 
 /** 获取 Windows 音频输入设备 */
