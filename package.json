@@ -22,10 +22,22 @@
             "!bin/**/*"
         ],
         "win": {
-            "target": [ "nsis" ]
+            "target": [ "nsis" ],
+            "extraResources": [
+                {
+                    "from": "bin/win32",
+                    "to": "bin"
+                }
+            ]
         },
         "linux": {
-            "target": [ "deb" ]
+            "target": [ "deb" ],
+            "extraResources": [
+                {
+                    "from": "bin/linux",
+                    "to": "bin"
+                }
+            ]
         },
         "mac": {
             "target": [ "dmg" ],
