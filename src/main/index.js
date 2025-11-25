@@ -18,30 +18,16 @@ if (!gotTheLock) { app.quit() } else {
         }
     });
 
-    // Electron初始化完成时创建主窗口，部分API需在此事件后使用
+    // Electron初始化完成时创建主窗口
     app.whenReady().then(() => {
         createWindow();
-        app.on("activate", function() {
-            // 在 MacOS系统规范中，当用户点击Dock图标且当前无其他窗口打开时，通常会重新创建应用窗口
-            if (mainWindow === null) createWindow();
-        });
 
         // 应用退出前结束正在执行的Ffmpeg进程
         app.on('before-quit', () => {
             if (global.ffmpegProcess && global.ffmpegProcess.kill) {
-                try {
-                    global.ffmpegProcess.kill();
-                } catch (error) {
-                    // Ignored
-                }
+                try { global.ffmpegProcess.kill(); } catch (error) {}  // Ignored error
             }
         });
-    });
-
-    // 所有窗口关闭后事件
-    app.on("window-all-closed", function() {
-        // 在MacOS系统规范中，应用程序关闭后通常会保持激活状态，直到通过 Cmd+Q 明确退出。
-        if (process.platform !== "darwin") app.quit();
     });
 }
 

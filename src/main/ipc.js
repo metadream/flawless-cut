@@ -67,7 +67,7 @@ function createTranscodeServer(event, port = 4725) {
     }).listen(port);
 
     transcodeServer.on("error", e => {
-        event.sender.send("transcode-error", e.message);
+        sendContents(event.sender, "transcode-error", e.message);
     });
 }
 
@@ -96,49 +96,47 @@ function removeTray() {
 function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
     ipcMain.handle(ipcName, (event, ...args) => {
         if (global.ffmpegProcess) {
-            event.sender.send("ipc-error", "Wait for the previous operation to complete.");
+            sendContents(event.sender, "ipc-error", "Wait for the previous operation to complete.");
             return;
         }
 
         try {
-            const proc = ffmpegMethod(...args);
-            global.ffmpegProcess = proc;
-
-            proc.emitter.on("start", () => {
-                event.sender.send("process-start");
+            global.ffmpegProcess = ffmpegMethod(...args);
+            global.ffmpegProcess.emitter.on("start", () => {
+                sendContents(event.sender, "process-start");
             });
-            proc.emitter.on("progress", p => {
-                event.sender.send("process-progress", p);
+            global.ffmpegProcess.emitter.on("progress", p => {
+                sendContents(event.sender, "process-progress", p);
             });
-            proc.emitter.on("complete", () => {
+            global.ffmpegProcess.emitter.on("complete", () => {
+                sendContents(event.sender, "process-complete");
                 global.ffmpegProcess = null;
-                // 防止应用强制退出后IPC仍旧发送数据导致报错
-                if (!event.sender.isDestroyed()) {
-                    event.sender.send("process-complete");
-                }
             });
-            proc.emitter.on("error", e => {
-                event.sender.send("process-error", e.message);
+            global.ffmpegProcess.emitter.on("error", e => {
+                sendContents(event.sender, "process-error", e.message);
             });
 
             if (ipcName === "ffmpeg-record-screen") {
-                proc.emitter.on("start", () => {
+                global.ffmpegProcess.emitter.on("start", () => {
                     createTray();
                 });
-                proc.emitter.on("timeupdate", t => {
-                    if (!event.sender.isDestroyed()) {
-                        event.sender.send("recording-update", t);
-                    }
+                global.ffmpegProcess.emitter.on("timeupdate", t => {
+                    sendContents(event.sender, "recording-update", t);
                 });
-                proc.on("exit", () => {
+                global.ffmpegProcess.on("exit", () => {
+                    sendContents(event.sender, "recording-exit");
                     removeTray();
-                    if (!event.sender.isDestroyed()) {
-                        event.sender.send("recording-exit");
-                    }
                 });
             }
         } catch (e) {
-            event.sender.send("ipc-error", e.message);
+            sendContents(event.sender, "ipc-error", e.message);
         }
     });
+}
+
+/** 安全保护：防止应用强制退出后IPC仍旧发送数据导致报错 */
+function sendContents(webContents, channel, ...args) {
+    if (webContents && !webContents.isDestroyed()) {
+        webContents.send(channel, ...args);
+    }
 }
