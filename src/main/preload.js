@@ -6,9 +6,6 @@ contextBridge.exposeInMainWorld("electron", {
     getAppPath: () => ipcRenderer.invoke("get-app-path"),
     getDesktop: () => ipcRenderer.invoke("get-desktop"),
 
-    createTray: () => ipcRenderer.invoke("create-tray"),
-    removeTray: () => ipcRenderer.invoke("remove-tray"),
-
     openExternal: url => ipcRenderer.invoke("open-external", url),
     openFileDialog: multiple => ipcRenderer.invoke("open-file-dialog", multiple),
     getFilePath: file => webUtils.getPathForFile(file)

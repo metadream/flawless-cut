@@ -25,7 +25,7 @@ if (!gotTheLock) { app.quit() } else {
         // 应用退出前结束正在执行的Ffmpeg进程
         app.on('before-quit', () => {
             if (global.ffmpegProcess && global.ffmpegProcess.kill) {
-                try { global.ffmpegProcess.kill(); } catch (error) {}  // Ignored error
+                try { global.ffmpegProcess.kill("SIGKILL"); } catch (e) {}  // Ignored error
             }
         });
     });
