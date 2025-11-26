@@ -29,13 +29,7 @@ handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(.
 handleFfmpegIpcMethod("ffmpeg-merge-videos", (...args) => ffmpeg.mergeVideos(...args));
 handleFfmpegIpcMethod("ffmpeg-extract-audio", (...args) => ffmpeg.extractAudio(...args));
 handleFfmpegIpcMethod("ffmpeg-capture-image", (...args) => ffmpeg.captureImage(...args));
-handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => {
-    if (hasRecordingPermission()) {
-        ffmpeg.recordScreen(...args);
-    } else {
-        throw new Error("Screen recording permission is not available.");
-    }
-});
+handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => ffmpeg.recordScreen(...args));
 
 /** 打开原生文件选择对话框并限制媒体格式 */
 function openMediaDialog(multiple = false) {
@@ -102,6 +96,10 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
     ipcMain.handle(ipcName, (event, ...args) => {
         if (global.ffmpegProcess) {
             sendContents(event.sender, "ipc-error", "Wait for the previous operation to complete.");
+            return;
+        }
+        if (ipcName === "ffmpeg-record-screen" && !hasRecordingPermission()) {
+            sendContents(event.sender, "ipc-error", "Screen recording permission is not available.");
             return;
         }
 
