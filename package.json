@@ -23,32 +23,25 @@
         ],
         "win": {
             "target": [ "nsis" ],
+            "icon": "assets/build/icon.ico",
             "extraResources": [
-                {
-                    "from": "bin/win32",
-                    "to": "bin"
-                }
+                { "from": "bin/win32", "to": "bin" }
             ]
         },
         "linux": {
             "target": [ "deb" ],
+            "icon": "assets/build/icon.png",
             "extraResources": [
-                {
-                    "from": "bin/linux",
-                    "to": "bin"
-                }
+                { "from": "bin/linux", "to": "bin" }
             ]
         },
         "mac": {
             "target": [ "dmg" ],
             "icon": "assets/build/icon.icns",
+            "category": "public.app-category.productivity",
             "extraResources": [
-                {
-                    "from": "bin/darwin",
-                    "to": "bin"
-                }
-            ],
-            "category": "public.app-category.productivity"
+                { "from": "bin/darwin", "to": "bin" }
+            ]
         }
     },
     "devDependencies": {
