@@ -41,7 +41,13 @@
             "category": "public.app-category.productivity",
             "extraResources": [
                 { "from": "bin/darwin", "to": "bin" }
-            ]
+            ],
+            "hardenedRuntime": true,
+            "entitlementsInherit": "assets/build/entitlements.mac.plist",
+            "extendInfo": {
+                "NSMicrophoneUsageDescription": "Please allow access to the microphone",
+                "NSDesktopCaptureUsageDescription": "Please allow screen recording"
+            }
         }
     },
     "devDependencies": {
