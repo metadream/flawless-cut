@@ -3,7 +3,7 @@ import path from "path";
 import "./ipc.js";
 
 const appPath = app.getAppPath();
-const appIcon = path.join(appPath, "assets/build/icon.png");
+const appIcon = path.join(appPath, `assets/build/icon.${process.platform === "win32" ? "ico" : "png"}`);
 const preload = path.join(appPath, "src/main/preload.js");
 let mainWindow, isQuitting = false;
 
