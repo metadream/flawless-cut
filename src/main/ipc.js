@@ -1,4 +1,4 @@
-import { app, dialog, ipcMain, nativeImage, shell, Tray } from "electron";
+import { app, dialog, ipcMain, nativeImage, shell, systemPreferences, Tray } from "electron";
 import http from "http";
 import path from "path";
 import * as ffmpeg from "./ffmpeg.js";
@@ -29,7 +29,13 @@ handleFfmpegIpcMethod("ffmpeg-convert-video", (...args) => ffmpeg.convertVideo(.
 handleFfmpegIpcMethod("ffmpeg-merge-videos", (...args) => ffmpeg.mergeVideos(...args));
 handleFfmpegIpcMethod("ffmpeg-extract-audio", (...args) => ffmpeg.extractAudio(...args));
 handleFfmpegIpcMethod("ffmpeg-capture-image", (...args) => ffmpeg.captureImage(...args));
-handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => ffmpeg.recordScreen(...args));
+handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => {
+    if (hasRecordingPermission()) {
+        ffmpeg.recordScreen(...args);
+    } else {
+        throw new Error("Screen recording permission is not available.");
+    }
+});
 
 /** 打开原生文件选择对话框并限制媒体格式 */
 function openMediaDialog(multiple = false) {
@@ -131,6 +137,20 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
             sendContents(event.sender, "ipc-error", e.message);
         }
     });
+}
+
+/**
+ * 获取录屏和录音权限
+ * 在Windows/Linux上，一般返回true
+ * 在MacOS上，打包时需要通过开发者ID签名才能弹窗请求授权，因此本应用无法在MacOS上录屏
+ */
+function hasRecordingPermission() {
+    try {
+        return systemPreferences.getMediaAccessStatus("screen") === "granted"
+            && systemPreferences.getMediaAccessStatus("microphone") === "granted";
+    } catch (e) {
+        return false;
+    }
 }
 
 /** 安全保护：防止应用强制退出后IPC仍旧发送数据导致报错 */
