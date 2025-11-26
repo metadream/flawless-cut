@@ -61,7 +61,7 @@ export default new class Video {
 
         if (!this.duration) {
             video.source = null;
-            video.removeAttribute('src');
+            video.removeAttribute("src");
             video.load();
             fileChooser.style.opacity = 1;
             Toast.error("Not a media file");

@@ -23,7 +23,7 @@ if (!gotTheLock) { app.quit() } else {
         createWindow();
 
         // 应用退出前结束正在执行的Ffmpeg进程
-        app.on('before-quit', () => {
+        app.on("before-quit", () => {
             if (global.ffmpegProcess && global.ffmpegProcess.kill) {
                 try { global.ffmpegProcess.kill("SIGKILL"); } catch (e) {}  // Ignored error
             }
@@ -57,16 +57,16 @@ function createWindow() {
     }
 
     // 窗口即将关闭事件：当子进程正在运行时弹窗提示
-    mainWindow.on('close', (event) => {
+    mainWindow.on("close", (event) => {
         if (!global.ffmpegProcess || isQuitting) return;
 
         event.preventDefault();
         const choice = dialog.showMessageBoxSync({
-            type: 'question',
-            defaultId: 1,
-            buttons: ['Quit Forcefully', 'Cancel Quit'],
-            title: 'Confirm to quit',
-            message: 'Process is still in progress. Sure to quit forcefully?'
+            type: "question",
+            title: "Confirm to quit",
+            message: "Process is still in progress. Sure to quit forcefully?",
+            buttons: ["Force Quit", "Cancel Quit"],
+            defaultId: 1
         });
 
         if (choice === 0) {

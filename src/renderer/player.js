@@ -4,7 +4,7 @@ import recorder from "./recorder.js";
 import video from "./video.js";
 import merger from "./merger.js";
 
-const metaInfo = $('.metadata');
+const metaInfo = $(".metadata");
 const timeline = $(".timeline");
 const currentTime = $("#currentTime");
 const duration = $("#duration");

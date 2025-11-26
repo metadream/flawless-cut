@@ -15,7 +15,7 @@ const ffmpeg = getExecutablePath("ffmpeg");
 export function getMediaInfo(inputFile) {
     try {
         const stdout = execFileSync(mediainfo, [inputFile, "--Output=JSON"],
-            { encoding: 'utf8' });
+            { encoding: "utf8" });
         if (stdout.trim()) {
             const mediaTrack = JSON.parse(stdout).media.track;
             const mediaInfo = {};
@@ -98,7 +98,7 @@ export function mergeVideos(inputFiles) {
     // 通过管道写入文件列表的方式报错：Readable.from(fileList).pipe(process.stdin);
     // 故改为创建临时文件方式作为输入
     const tmpFile = path.join(os.tmpdir(), "flawless-merge-list.txt");
-    const fileList = inputFiles.map(p => "file '" + p + "'").join("\n");
+    const fileList = inputFiles.map(p => `file '${p}'`).join("\n");
     fs.writeFileSync(tmpFile, fileList);
 
     const outputFile = inputFiles[0] + "-merged" + path.extname(inputFiles[0]);
@@ -161,12 +161,12 @@ function ffmpegCommand(args, options) {
     const proc = spawn(ffmpeg, args, options);
 
     // 监听进程开始事件
-    proc.on('spawn', () => {
+    proc.on("spawn", () => {
         emitter.emit("start");
     });
 
     // Ffmpeg的进度信息包含在标准错误输出中
-    proc.stderr.on('data', (data) => {
+    proc.stderr.on("data", (data) => {
         const match = / time=(\d{2}:\d{2}:\d{2}\.\d{2,3}) /.exec(data);
         if (match) {
             emitter.emit("timeupdate", match[1]);
@@ -181,12 +181,12 @@ function ffmpegCommand(args, options) {
     });
 
     // 进程正常结束
-    proc.on('close', () => {
+    proc.on("close", () => {
         emitter.emit("complete");
     });
 
     // 无法创建进程或进程启动失败
-    proc.on('error', (error) => {
+    proc.on("error", (error) => {
         error = error.toString().trim();
         error = error.substring(error.lastIndexOf("\n") + 1);
         error = error.substring(error.lastIndexOf(":") + 1);
@@ -200,7 +200,7 @@ function ffmpegCommand(args, options) {
 function getAudioDevice() {
     try {
         execFileSync(ffmpeg, ["-list_devices", "true", "-f", "dshow", "-i", "dummy"], {
-            encoding: 'utf8'
+            encoding: "utf8"
         });
     } catch (error) {
         // 设备信息包含在标准错误输出中

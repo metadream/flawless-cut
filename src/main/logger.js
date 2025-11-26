@@ -1,9 +1,15 @@
+import { app } from "electron";
 import fs from "fs";
 import path from "path";
-import { app } from "electron";
 
-const logFile = path.join(app.getPath("desktop"), 'myapp.log');
+// Electron默认日志路径
+// Linux/Windows: userData/AppName
+// MacOS: ~/Library/Logs/AppName
+const logFile = path.join(app.getPath("logs"), "flawless-cut.log");
 
-export default function log(msg) {
-    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${msg}\n`);
+export function log(e) {
+    const stack = e instanceof Error ? e.stack : String(e);
+    const timestamp = new Date().toISOString();
+    const message = `[${timestamp}] ${stack}\n${"-".repeat(80)}\n`;
+    fs.appendFileSync(logFile, message);
 }
