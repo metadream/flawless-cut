@@ -19,8 +19,6 @@ ipcMain.handle("get-app-path", () => app.getAppPath());
 ipcMain.handle("get-desktop", () => app.getPath("desktop"));
 ipcMain.handle("open-file-dialog", (event, multiple) => openMediaDialog(multiple));
 ipcMain.handle("open-external", (event, url) => shell.openExternal(url));
-ipcMain.handle("create-tray", () => createTray());
-ipcMain.handle("remove-tray", () => removeTray());
 
 /** 注册 FFMPEG IPC 方法 */
 ipcMain.handle("create-transcode-server", (event, port) => createTranscodeServer(event, port));
@@ -84,6 +82,7 @@ function createTray() {
     recordingTray.on("click", () => {
         global.mainWindow.show();
     });
+    global.mainWindow.minimize();
 }
 
 /** 移除系统托盘 */

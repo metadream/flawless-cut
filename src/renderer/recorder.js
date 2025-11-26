@@ -35,10 +35,10 @@ export default new class Recorder {
             this.hide();
         });
 
+        // 监听错误事件
         ffmpeg.on("process-error", () => {
             this.resetControls();
         });
-
         ffmpeg.on("ipc-error", () => {
             this.resetControls();
         });
