@@ -82,7 +82,7 @@ export function recordScreen(outputPath) {
             break;
         // MacOS 1:0表示视频设备1（通常是主屏幕），音频设备0（通常是默认麦克风）。
         case "darwin":
-            args = ["-f", "avfoundation", "-i", "1:0"];
+            args = ["-f", "avfoundation", "-framerate", 30, "-i", '1:0'];
             break;
         default:
             throw new Error(`Unsupported platform ${platform}`);
