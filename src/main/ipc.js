@@ -109,6 +109,7 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
 
         try {
             global.ffmpegProcess = ffmpegMethod(...args);
+
             global.ffmpegProcess.emitter.on("start", () => {
                 sendContents(event.sender, "process-start");
             });
