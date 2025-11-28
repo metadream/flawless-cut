@@ -71,10 +71,11 @@ function createTranscodeServer(event, port = 4725) {
 
 /** 创建系统托盘 (MacOS为菜单栏图标) */
 function createTray() {
+    if (recordingTray) return;
     let count = 0;
+
     recordingTray = new Tray(defaultImage);
     recordingTray.setToolTip("Screen Recording...");
-
     recordingTray.timer = setInterval(() => {
         recordingTray.setImage(count++ % 2 === 0 ? defaultImage : recordingImage);
     }, 500);
@@ -87,8 +88,11 @@ function createTray() {
 
 /** 移除系统托盘 */
 function removeTray() {
-    clearInterval(recordingTray.timer);
-    recordingTray.destroy();
+    if (recordingTray) {
+        clearInterval(recordingTray.timer);
+        recordingTray.destroy();
+        recordingTray = null;
+    }
 }
 
 /** 注册 FFMPEG 方法并监听进程事件 */
@@ -120,11 +124,9 @@ function handleFfmpegIpcMethod(ipcName, ffmpegMethod) {
             });
 
             if (ipcName === "ffmpeg-record-screen") {
-                global.ffmpegProcess.emitter.on("start", () => {
-                    createTray();
-                });
                 global.ffmpegProcess.emitter.on("timeupdate", t => {
                     sendContents(event.sender, "recording-update", t);
+                    createTray();
                 });
                 global.ffmpegProcess.on("exit", () => {
                     sendContents(event.sender, "recording-exit");
