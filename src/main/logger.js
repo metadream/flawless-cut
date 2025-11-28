@@ -12,4 +12,5 @@ export function log(e) {
     const timestamp = new Date().toISOString();
     const message = `[${timestamp}] ${stack}\n${"-".repeat(80)}\n`;
     fs.appendFileSync(logFile, message);
+    return logFile;
 }
