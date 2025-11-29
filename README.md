@@ -1,5 +1,7 @@
 # Flawless-Cut
 
+[English](README.md) | [简体中文](README_zh.md)
+
 Flawless-Cut was developed to improve the user interface of another
 application, [Lossless-Cut](https://github.com/mifi/lossless-cut), a new plan for UI were mentioned in that project's
 issue but never upgraded. Compared to Lossless-Cut, Flawless-Cut removes some infrequently used features and user
