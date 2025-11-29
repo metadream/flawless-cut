@@ -6,7 +6,7 @@ Flawless-Cut 的开发是为了改进另一款应用程序 [Lossless-Cut](https:
 issue 中提到过新的 UI 方案，但一直未能升级。与 Lossless-Cut 相比，Flawless-Cut 删除了一些不常用的功能和用户偏好设置，使其保持简洁易用。尽管
 Flawless-Cut 在代码层面几乎完全重写，但仍借鉴了 Lossless-Cut 的许多实现方式，特此致谢。
 
-![Software Interface](https://raw.githubusercontent.com/metadream/flawless-cut/master/screenshot.png)
+![Software Interface](https://raw.githubusercontent.com/metadream/flawless-cut/main/assets/screenshot.png)
 
 ## 主要功能
 
