@@ -1,20 +1,5 @@
 # Flawless-Cut
 
-1. Electron version upgrade
-2. Code refactoring
-3. Interface optimization
-
-sips -s format icns icon.png --out icon.icns
-
-ffmpeg static build v8.0.1 待确认
-https://www.ffmpeg.org/download.html
-Windows: https://github.com/BtbN/FFmpeg-Builds/releases
-Linux: https://github.com/BtbN/FFmpeg-Builds/releases
-MacOS: https://evermeet.cx/ffmpeg
-
-mediainfo static v25.10 待确认
-https://mediaarea.net/en/MediaInfo
-
 Flawless-Cut was developed to improve the user interface of another
 application, [Lossless-Cut](https://github.com/mifi/lossless-cut), a new plan for UI were mentioned in that project's
 issue but never upgraded. Compared to Lossless-Cut, Flawless-Cut removes some infrequently used features and user
@@ -25,22 +10,23 @@ still borrows from many practices of Lossless-Cut, thanks for that.
 
 ## Main Features
 
-- Losslessly cut video/audio in common formats (fast)
-- Losslessly merge video/audio clips of the same encoding format (fast)
-- Lossy cut video/audio and convert to MP4 format (slow)
-- Lossy cut or extract audio from video and convert to MP3 format (slow)
+- Losslessly cut video/audio in common formats (very fast)
+- Losslessly merge video/audio clips of the same encoding format (very fast)
+- Lossy cut video/audio and convert to MP4 format (fast)
+- Lossy cut or extract audio from video and convert to MP3 format (fast)
 - Capture video frames as pictures with the smallest file and highest quality
 - Record output of screen and microphone
 - Visualization of audio sound waves
-- Support for Windows/Linux platforms
+- Support for Windows/Linux/MacOS platforms
 
 ## Shortcut Keys
 
 Key         | Action
 ----------- | ------------------
+Right Arrow | Forward one second
+Left Arrow  | Go back one second
 Space       | Play/Pause
-Right arrow | Forward one second
-Left arrow  | Go back one second
+Backquote   | Display metadata
 
 ## Supported Formats
 
@@ -56,43 +42,60 @@ the same as the native support format.
 
 ## Develop and Build
 
-### 1\. Install NODE & NPM
+### 1. Install NODE & NPM
 
 Please install it yourself.
 
-### 2\. Install Dependencies
+### 2. Install Dependencies
 
+```bash
+npm install
 ```
-# Linux/macOS
+
+If you encounter network issues in mainland China, please use the mirror of ELECTRON.
+
+```bash
+# Linux/MacOS
 export ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
 
-# Windows cmd
+# Windows CMD
 set ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
 
 # Windows PowerShell
 $env:ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
 
+# Maybe you need this
 npm config set strict-ssl false
+
+# And then try again
 npm install
 ```
 
-### 3\. Run and Debug
+### 3. Run and Debug
 
-```
+```bash
 npm start
 ```
 
-If you have problems when opening video files, try the following commands:
+### 4. Build by Platform
 
-```
-chmod +x app/bin/*
-sudo apt install -y libmediainfo-dev
-```
-
-### 4\. Build by Platform
-
-```
+```bash
 npm run build:linux
 npm run build:win
 npm run build:mac
+```
+
+## Appendix
+
+### Mediainfo & Ffmpeg Static Build
+
+- https://mediaarea.net/en/MediaInfo
+- https://www.ffmpeg.org/download.html
+  - Windows: https://github.com/BtbN/FFmpeg-Builds/releases
+  - Linux: https://github.com/BtbN/FFmpeg-Builds/releases
+  - MacOS: https://evermeet.cx/ffmpeg
+
+### Convert PNG to ICNS
+```bash
+sips -s format icns icon.png --out icon.icns
 ```
