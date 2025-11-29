@@ -38,8 +38,8 @@ function createWindow() {
 
     // 创建浏览器窗口
     mainWindow = global.mainWindow = new BrowserWindow({
-        width: 800,   // 设置默认窗口比例是16:9
-        height: 580,
+        width: 800,   // 设置视频显示区域比例是16:9
+        height: 612,
         icon: appIcon,
         webPreferences: {
             nodeIntegration: false,
