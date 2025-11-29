@@ -1,0 +1,477 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: "Saira";
+    src: url(saira.ttf) format("truetype");
+}
+
+:root {
+    --font-color: #333;
+    --gray-color: #999;
+    --minor-color: #ccc;
+    --bg-color: #eee;
+    --contrast-color: 220, 51, 102; /* #d36 */
+    --panel-color: #343d46;
+    --ondrag-color: #38424b;
+    --timeline-color: #4a5560;
+    --split-color: #67737f;
+    --text-size: 14px;
+    --title-size: 30px;
+}
+
+body {
+    margin: 0;
+    color: var(--font-color);
+    background: var(--bg-color);
+    font-size: var(--text-size);
+    font-family: "Saira";
+}
+
+/* --------------------------------------------------------
+ * Layout Main
+ * ----------------------------------------------------- */
+
+main {
+    position: fixed;
+    bottom: 130px;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: var(--panel-color);
+    display: flex;
+    justify-content: center;
+}
+
+main video {
+    max-width: 100%;
+}
+
+main canvas {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#file-chooser {
+    position: absolute;
+    top: 60px;
+    bottom: 60px;
+    left: 60px;
+    right: 60px;
+    font-size: var(--title-size);
+    color: var(--timeline-color);
+    border: var(--timeline-color) 3px dashed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#file-chooser.ondrag {
+    background: var(--ondrag-color);
+}
+
+/* --------------------------------------------------------
+ * Layout Toolbar
+ * ----------------------------------------------------- */
+
+.toolbar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 130px;
+    text-align: center;
+}
+
+.timeline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 40px;
+    line-height: 40px;
+    color: var(--gray-color);
+    background: var(--timeline-color);
+    cursor: default;
+    user-select: none;
+}
+
+.timeline > span {
+    width: 100px;
+}
+
+.timeline #segment {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(var(--contrast-color), .6);
+}
+
+.timeline #progress {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: var(--gray-color);
+}
+
+.controls {
+    border-bottom: var(--minor-color) 1px solid;
+}
+
+.controls input {
+    font: inherit;
+    color: inherit;
+    background: inherit;
+    outline: none;
+    border: 0;
+    width: 100px;
+    text-align: center;
+}
+
+.controls, .features {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --------------------------------------------------------
+ * Component Merger
+ * ----------------------------------------------------- */
+
+.merger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-color);
+}
+
+.merger .content {
+    flex: 1;
+    background: var(--timeline-color);
+    color: var(--minor-color);
+    padding: 60px;
+    overflow-y: auto;
+}
+
+.merger .title {
+    font-size: var(--title-size);
+    text-align: right;
+}
+
+.merger ol {
+    padding: 0;
+}
+
+.merger li {
+    position: relative;
+    padding: 10px 0;
+    word-break: break-all;
+}
+
+.merger li::before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 0;
+    right: 0;
+    height: 1px;
+    background: var(--split-color);
+}
+
+.merger .footer {
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.merger button {
+    width: 100px;
+    margin: 0 10px;
+}
+
+.merger button.merge {
+    background: rgb(var(--contrast-color));
+}
+
+.merger button.cancel {
+    background: var(--gray-color);
+}
+
+/* --------------------------------------------------------
+ * Component Recorder
+ * ----------------------------------------------------- */
+
+.recorder {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    background-color: var(--panel-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s 0s, visibility 0s 0.3s;
+}
+
+.recorder.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s 0s, visibility 0s 0s;
+}
+
+.recorder.visible > div {
+    transform: scale(1);
+}
+
+.recorder > div {
+    background: #fff;
+    transform: scale(0.8);
+    transition: transform 0.3s 0s;
+}
+
+.recorder > div > div {
+    padding: 20px 30px;
+    font-size: var(--title-size);
+}
+
+.recorder button {
+    width: 100%;
+    height: 50px;
+}
+
+.recorder button.start {
+    background: var(--timeline-color);
+}
+
+.recorder button.stop {
+    display: none;
+    background: rgb(var(--contrast-color));
+}
+
+/* --------------------------------------------------------
+ * Metadata Panel
+ * ----------------------------------------------------- */
+
+.metadata {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 11px;
+    color: yellow;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.metadata.show {
+    display: block;
+}
+
+.metadata td:not([align]) {
+    padding: 0 3px;
+}
+
+/* --------------------------------------------------------
+ * Component Loading
+ * ----------------------------------------------------- */
+
+.loading {
+    position: fixed;
+    display: none;
+    top: 40px;
+    left: 40px;
+    width: 50px;
+    height: 50px;
+}
+
+.loading .loader {
+    position: absolute;
+    animation: spin 2s linear infinite;
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+    background-image: url("icons/loading.svg");
+}
+
+.loading .pointer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------
+ * Component Toast
+ * ----------------------------------------------------- */
+
+.toast {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toast > div {
+    position: absolute;
+    z-index: 999;
+    top: -100px;
+    color: #fff;
+    background: var(--split-color);
+    padding: 10px 20px;
+    border-radius: 3px;
+    transition: top .5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.toast > div.success {
+    background: rgba(0, 207, 102, .8);
+}
+
+.toast > div.warn {
+    background: rgba(255, 165, 0, .8);
+}
+
+.toast > div.error {
+    background: rgba(238, 77, 55, .8);
+}
+
+.toast > div.visible {
+    top: 40px;
+}
+
+/* --------------------------------------------------------
+ * Control Buttons
+ * ----------------------------------------------------- */
+
+button {
+    border: 0;
+    outline: 0;
+    width: 40px;
+    height: 40px;
+    opacity: 0.8;
+    cursor: pointer;
+    font: inherit;
+    color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px 16px;
+    background-color: transparent;
+    transition: all .3s;
+}
+
+button:hover {
+    opacity: 1;
+}
+
+button:disabled, button:disabled:hover {
+    opacity: 0.3;
+    cursor: default;
+}
+
+button.segment-start, button.segment-end {
+    width: 30px;
+}
+
+button.cut {
+    width: 60px;
+    height: 50px;
+    background-size: 24px 24px;
+}
+
+button.info {
+    position: absolute;
+    left: 10px;
+    background-image: url("icons/info.svg");
+}
+
+button.video-start {
+    background-image: url("icons/triangle-left.svg");
+}
+
+button.video-end {
+    background-image: url("icons/triangle-right.svg");
+}
+
+button.segment-start {
+    background-image: url("icons/arrow-left.svg");
+}
+
+button.segment-end {
+    background-image: url("icons/arrow-right.svg");
+}
+
+button.cut-start {
+    background-image: url("icons/mustache-left.svg");
+}
+
+button.cut-end {
+    background-image: url("icons/mustache-right.svg");
+}
+
+button.play {
+    background-image: url("icons/play.svg");
+}
+
+button.pause {
+    background-image: url("icons/pause.svg");
+}
+
+button.capture {
+    background-image: url("icons/image.svg");
+}
+
+button.extract {
+    background-image: url("icons/sound.svg");
+}
+
+button.cut {
+    background-image: url("icons/scissor.svg");
+}
+
+button.convert {
+    background-image: url("icons/convert.svg");
+}
+
+button.open-files {
+    background-image: url("icons/plus.svg");
+}
+
+button.open-record {
+    background-image: url("icons/record.svg");
+}
+
+button.repo {
+    background-image: url("icons/octocat.svg");
+}

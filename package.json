@@ -1,13 +1,14 @@
 {
     "name": "flawless-cut",
-    "productName": "Flawless Cut",
-    "version": "1.1.0",
-    "description": "Fast and lossless video cutter and merger",
-    "author": "Ai Chen",
+    "productName": "FlawlessCut",
+    "version": "1.2.0",
+    "description": "Fast, lossless video cutter and merger",
+    "author": "Marco Chan",
     "repository": "github:metadream/flawless-cut",
-    "copyright": "Copyright (c) 2019-2023",
+    "copyright": "Copyright (c) 2019-2026",
     "license": "MIT",
-    "main": "app/main.js",
+    "type": "module",
+    "main": "src/main/index.js",
     "scripts": {
         "start": "electron .",
         "build:linux": "electron-builder -l",
@@ -16,28 +17,42 @@
     },
     "build": {
         "appId": "flawless-cut",
-        "productName": "Flawless Cut",
+        "files": [
+            "**/*",
+            "!bin/**/*"
+        ],
         "win": {
-            "target": [ "nsis" ]
+            "target": [ "nsis" ],
+            "icon": "assets/build/icon.ico",
+            "extraResources": [
+                { "from": "bin/win32", "to": "bin" }
+            ]
         },
         "linux": {
-            "target": [ "deb" ]
+            "target": [ "deb" ],
+            "icon": "assets/build/icon.png",
+            "extraResources": [
+                { "from": "bin/linux", "to": "bin" }
+            ]
         },
         "mac": {
-            "icon": "build/icons/icon.icns",
-            "target": "dmg",
+            "target": [ "dmg" ],
+            "icon": "assets/build/icon.icns",
             "category": "public.app-category.productivity",
+            "extraResources": [
+                { "from": "bin/darwin", "to": "bin" }
+            ],
+            "hardenedRuntime": true,
+            "entitlements": "assets/build/entitlements.mac.plist",
+            "entitlementsInherit": "assets/build/entitlements.mac.plist",
             "extendInfo": {
-                "CFBundleDisplayName": "Flawless Cut"
+                "NSMicrophoneUsageDescription": "Please allow access to the microphone",
+                "NSDesktopCaptureUsageDescription": "Please allow screen recording"
             }
         }
     },
     "devDependencies": {
-        "electron": "^23.1.0",
-        "electron-builder": "^23.6.0"
-    },
-    "dependencies": {
-        "string-to-stream": "^3.0.1",
-        "@electron/remote": "^2.0.10"
+        "electron": "^39.2.2",
+        "electron-builder": "^26.0.12"
     }
 }
