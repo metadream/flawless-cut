@@ -3,7 +3,7 @@
     "productName": "FlawlessCut",
     "version": "1.2.0",
     "description": "Fast, lossless video cutter and merger",
-    "author": "Marco Chan",
+    "author": "Marco Chan <app@zerg.cc>",
     "repository": "github:metadream/flawless-cut",
     "copyright": "Copyright (c) 2019-2026",
     "license": "MIT",
@@ -31,6 +31,7 @@
         "linux": {
             "target": [ "deb" ],
             "icon": "assets/build/icon.png",
+            "category": "Utility",
             "extraResources": [
                 { "from": "bin/linux", "to": "bin" }
             ]

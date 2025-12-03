@@ -82,6 +82,13 @@ npm run build:win
 npm run build:mac
 ```
 
+在Linux上，你可能还需要执行以下命令：
+
+```bash
+chmod +x bin/linux/*
+sudo apt install -y libmediainfo-dev
+```
+
 ## 附录
 
 ### Mediainfo & Ffmpeg 静态构建

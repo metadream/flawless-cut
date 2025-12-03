@@ -87,6 +87,13 @@ npm run build:win
 npm run build:mac
 ```
 
+On Linux, you may also need to run the following commands.
+
+```bash
+chmod +x bin/linux/*
+sudo apt install -y libmediainfo-dev
+```
+
 ## Appendix
 
 ### Mediainfo & Ffmpeg Static Build
