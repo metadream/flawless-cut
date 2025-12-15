@@ -149,10 +149,10 @@ export default new class Player {
                     playBtn.onclick();
                     break;
                 case "ArrowLeft":
-                    video.seek(video.currentTime - 1);
+                    video.seek(video.currentTime - (e.altKey ? 10 : 1));
                     break;
                 case "ArrowRight":
-                    video.seek(video.currentTime + 1);
+                    video.seek(video.currentTime + (e.altKey ? 10 : 1));
                     break;
                 case "Backquote":
                     infoBtn.click();
