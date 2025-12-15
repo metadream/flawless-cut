@@ -297,6 +297,7 @@ main canvas {
 
 .loading {
     position: fixed;
+    z-index: 1;
     display: none;
     top: 40px;
     left: 40px;
