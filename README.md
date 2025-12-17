@@ -25,10 +25,12 @@ still borrows from many practices of Lossless-Cut, thanks for that.
 
 Key         | Action
 ----------- | ------------------
-Right Arrow | Forward one second
-Left Arrow  | Go back one second
+Right Arrow | Forward 1 second
+Left Arrow  | Go back 1 second
+Alt + Right Arrow | Forward 10 seconds
+Alt + Left Arrow  | Go back 10 seconds
 Space       | Play/Pause
-Backquote   | Display metadata
+Backquote   | Toggle display metadata
 
 ## Supported Formats
 
