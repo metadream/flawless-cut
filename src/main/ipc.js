@@ -19,6 +19,7 @@ ipcMain.handle("get-app-path", () => app.getAppPath());
 ipcMain.handle("get-desktop", () => app.getPath("desktop"));
 ipcMain.handle("open-file-dialog", (event, multiple) => openMediaDialog(multiple));
 ipcMain.handle("open-external", (event, url) => shell.openExternal(url));
+ipcMain.handle("encodeFileName", (event, path) => encodeFileName(path));
 
 /** 注册 FFMPEG IPC 方法 */
 ipcMain.handle("create-transcode-server", (event, port) => createTranscodeServer(event, port));
@@ -30,6 +31,12 @@ handleFfmpegIpcMethod("ffmpeg-merge-videos", (...args) => ffmpeg.mergeVideos(...
 handleFfmpegIpcMethod("ffmpeg-extract-audio", (...args) => ffmpeg.extractAudio(...args));
 handleFfmpegIpcMethod("ffmpeg-capture-image", (...args) => ffmpeg.captureImage(...args));
 handleFfmpegIpcMethod("ffmpeg-record-screen", (...args) => ffmpeg.recordScreen(...args));
+
+/** 对文件路径中的文件名进行转义 */
+function encodeFileName(filePath) {
+    const encodedFilename = encodeURIComponent(path.basename(filePath));
+    return path.join(path.dirname(filePath), encodedFilename);
+}
 
 /** 打开原生文件选择对话框并限制媒体格式 */
 function openMediaDialog(multiple = false) {

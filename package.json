@@ -1,7 +1,7 @@
 {
     "name": "flawless-cut",
     "productName": "FlawlessCut",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "Fast, lossless video cutter and merger",
     "author": "Marco Chan <app@zerg.cc>",
     "repository": "github:metadream/flawless-cut",

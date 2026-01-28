@@ -69,7 +69,8 @@ export default new class Video {
         }
 
         // 更新播放器面板
-        video.src = video.source = path;
+        video.source = path;
+        video.src = await electron.encodeFileName(path);
         player.updateDuration();
         player.displayMediaInfo();
 
@@ -99,7 +100,9 @@ export default new class Video {
 
         if (this.transcoded) {
             this.startTime = timestamp;
-            video.src = "http://127.0.0.1:4725?source=" + this.source + "&fileSize=" + this.getMetadata("General.FileSize") + "&startTime=" + timestamp;
+            video.src = "http://127.0.0.1:4725?startTime=" + timestamp
+                + "&fileSize=" + this.getMetadata("General.FileSize")
+                + "&source=" + encodeURIComponent(this.source);
         } else {
             video.currentTime = timestamp;
         }

@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld("electron", {
 
     openExternal: url => ipcRenderer.invoke("open-external", url),
     openFileDialog: multiple => ipcRenderer.invoke("open-file-dialog", multiple),
+    encodeFileName: path => ipcRenderer.invoke("encodeFileName", path),
     getFilePath: file => webUtils.getPathForFile(file)
 });
 
