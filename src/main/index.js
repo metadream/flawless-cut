@@ -38,6 +38,7 @@ function createWindow() {
 
     // 创建浏览器窗口
     mainWindow = global.mainWindow = new BrowserWindow({
+        title: app.getName() + " " + app.getVersion(),
         width: 800,   // 设置视频显示区域比例是16:9
         height: 612,
         icon: appIcon,
