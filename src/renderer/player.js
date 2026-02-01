@@ -140,8 +140,9 @@ export default new class Player {
         }
 
         // 快捷键绑定
-        document.onkeyup = function(e) {
+        window.addEventListener('keyup', (e) => {
             e.preventDefault();
+            if (e.target.tagName == "INPUT") return;
             if (video.duration === undefined) return;
 
             switch (e.code) {
@@ -149,16 +150,16 @@ export default new class Player {
                     playBtn.onclick();
                     break;
                 case "ArrowLeft":
-                    video.seek(video.currentTime - (e.altKey ? 10 : 1));
+                    video.seek(video.currentTime - (e.ctrlKey ? 0.05 : e.altKey ? 10 : 1));
                     break;
                 case "ArrowRight":
-                    video.seek(video.currentTime + (e.altKey ? 10 : 1));
+                    video.seek(video.currentTime + (e.ctrlKey ? 0.05 : e.altKey ? 10 : 1));
                     break;
                 case "Backquote":
                     infoBtn.click();
                     break;
             }
-        }
+        });
     }
 
     /** 设置视频文件路径 */
